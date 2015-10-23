@@ -1,0 +1,15 @@
+{
+  "name": "queries",
+  "version": "0.0.1",
+  "description": "Simple queries to insert in the project",
+  "main": "example.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "path": "latest",
+    "request": "latest"
+  },
+  "author": "",
+  "license": "ISC"
+}
