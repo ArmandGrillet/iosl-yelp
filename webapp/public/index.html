@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="">
+
+	<meta name="author" content="IoSL - Yelp team">
+	<title>IoSL - Yelp</title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.red-blue.min.css"	>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- JS -->
+	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+	<script src="js/jquery.js"></script>
+	<script src="js/simple.js"></script>
+</head>
+
+<body>
+	<div class="mdl-grid" id ="app-grid">
+		<div class="mdl-cell mdl-cell--4-col" id ="configuration-column">
+			<!-- Always shows a header, even in smaller screens. -->
+			<div class="mdl-layout mdl-layout--fixed-header">
+				<header class="mdl-layout__header">
+					<div class="mdl-layout__header-row">
+						<!-- Title -->
+						<span class="mdl-layout-title">IoSL - Yelp</span>
+					</div>
+				</header>
+			</div>
+
+			<div class="mdl-grid">
+				<div class="mdl-cell mdl-cell--12-col">
+					<form>
+						<div class="form-group">
+							<label for="city">City</label>
+							<select class="form-control" id ="city">
+								<option value="Phoenix">Phoenix</option>
+								<!-- <option value="Las Vegas">Las Vegas</option> -->
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="typeOfBusiness">Business</label>
+							<select class="form-control" id ="business">
+								<option value = "Restaurants">Restaurant</option>
+								<option value = "Fast Food">Fast Food</option>
+								<option value = "Libraries">Library</option>
+							</select>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="mdl-cell mdl-cell--8-col" id ="map-column">
+			<div id="map"></div>
+		</div>
+	</div>
+</body>
+</html>

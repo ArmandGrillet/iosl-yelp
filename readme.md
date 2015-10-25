@@ -18,4 +18,7 @@ To run our code you'll need [Node.js](https://nodejs.org/en/).
 Our project is based on Apache Drill thus you should [start it](https://drill.apache.org/docs/starting-drill-on-linux-and-mac-os-x/) before doing anything else. If the [Web Interface of Drill](http://localhost:8047/) is live it's working!
 
 ### Testing simple queries
-Open the terminal, go on the 'queries' directories. You'll first need to install the dependencies through `npm install`, once it's done you can run scrips with a simple command like `node example.js`.
+Open the terminal, go on the 'queries' directory. You'll first need to install the dependencies through `npm install`, once it's done you can run scripts with a simple command like `node example.js`.
+
+### Running the web app
+Open the terminal, go on the 'webapp' directory. You'll first need to install the dependencies through `npm install`, once it's done you start our web app's engine with the command `node app.js`. Our web app is now [accessible using your Web browser](http://localhost:1337/).
