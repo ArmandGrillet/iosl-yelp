@@ -15,15 +15,24 @@ window.onload = function() {
 	}).addTo(map);
 
     $('#city, #business').on('change', getMapData);
-    getMapData();
+    $('#hotspots').on('click', getHotspots);
 }
 
 function getMapData() {
-    // goTo($('#city').val());
     $.get('/businesses', { city: $('#city').val(), business: $('#business').val() }, function(businesses) {
         markers.clearLayers();
         for (var business of businesses.rows) {
             markers.addLayer(L.marker([business.latitude, business.longitude]).bindPopup(business.name));
+        }
+    });
+}
+
+function getHotspots() {
+    $.get('/hotspots', function(hotspots) {
+        markers.clearLayers();
+        for (var hotspot of hotspots) {
+            console.log(hotspot.latitude);
+            markers.addLayer(L.marker([hotspot.latitude, hotspot.longitude]).bindPopup('Hotspot'));
         }
     });
 }

@@ -1,12 +1,10 @@
 'use strict';
 
 var express = require('express');
-var path = require('path');
 var query = require('./query');
 var request = require('request');
 
 var app = express();
-
 
 app.use(express.static('public'));
 
@@ -16,6 +14,15 @@ app.get('/businesses', function (req, res) {
     		res.send(businesses);
 		}
 	);
+});
+
+app.get('/hotspots', function (req, res) {
+    query.hotspots(
+        function(hotspots) {
+            console.log("End of the query");
+            res.send(hotspots);
+        }
+    );
 });
 
 var server = app.listen(1337, function () {
