@@ -95,9 +95,9 @@ module.exports = {
             var latitude = new Array();
             var count = 0;
             for (var row of firstAnswer.rows) {
-                count=count+1;
-                longitude[count] = row.latitude;
-                latitude[count] = row.longitude;
+                count++;
+                longitude[count] = row.longitude;
+                latitude[count] = row.latitude;
                 //console.log('Category: '+ row.Categories_of_Restaurant_in_Phoenix + 'Latitude: ' + row.latitude + " - longitude: " + row.longitude+" Addition: "+ (parseInt(longitude[count]) + parseInt(latitude[count])));
             }
             callback(get_hotspots(longitude,latitude));

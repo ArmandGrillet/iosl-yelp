@@ -31,7 +31,6 @@ function getHotspots() {
     $.get('/hotspots', function(hotspots) {
         markers.clearLayers();
         for (var hotspot of hotspots) {
-            console.log(hotspot.latitude);
             markers.addLayer(L.marker([hotspot.latitude, hotspot.longitude]).bindPopup('Hotspot'));
         }
     });
