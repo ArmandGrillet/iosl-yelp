@@ -1,53 +1,28 @@
+/*jslint node: true */
+
 'use strict';
 
 var express = require('express');
-var query = require('./query');
+var queriesManager = require('../queries/manager');
 var request = require('request');
 
 var app = express();
 
 app.use(express.static('public'));
 
-app.get('/businesses', function (req, res) {
-	doQuery("select name, latitude, longitude from " + datasetPath('business') + " where true=repeated_contains(categories,'" + req.query.business + "') and city='" + req.query.city + "'", 
-		function(businesses) {
-    		res.send(businesses);
-		}
-	);
+app.get('/mapquery', function(req, res) {
+    var query = req.query;
+    var algorithm = query.algorithm;
+    delete query.algorithm;
+    console.log(algorithm);
+    console.log(query);
+    queriesManager.do(algorithm, query, function(result) {
+        res.send(result);
+    });
 });
 
-app.get('/hotspots', function (req, res) {
-    query.hotspots(
-        function(hotspots) {
-            console.log("End of the query");
-            res.send(hotspots);
-        }
-    );
+var server = app.listen(1337, function() {
+    var port = server.address().port;
+
+    console.log('Listening on port %s', port);
 });
-
-var server = app.listen(1337, function () {
-  	var port = server.address().port;
-
-  	console.log('Listening on port %s', port);
-});
-
-function datasetPath(dataset) {
-    return 'dfs.`' + path.normalize(__dirname + '/../../yelp_dataset_challenge_academic_dataset/') + 'yelp_academic_dataset_' + dataset + '.json`'
-}
-
-function doQuery(query, callback) {
-    request.post(
-        'http://localhost:8047/query.json', // Address of Apache Drill
-        { 
-            json: {
-                'queryType': 'SQL',
-                'query': query
-            }
-        },
-        function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                callback(body);
-            }
-        }
-    );
-}

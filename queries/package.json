@@ -1,10 +1,14 @@
 {
-  "name": "queries",
+  "name": "iosl-queries",
   "version": "0.0.1",
   "description": "Simple queries to insert in the project",
   "main": "example.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+      "type": "git",
+      "url": "git://github.com/username/repository.git"
   },
   "dependencies": {
     "path": "latest",
