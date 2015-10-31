@@ -10,7 +10,6 @@ function getBusinessesWithNameInCity(city, business, callback) {
 module.exports = {
     get: function(parameters, callback) {
         if (parameters.business === undefined) { // We only need to test name as city is a mandatory attribute {
-            console.log('Parameter business is undefined');
             callback({
                 error: 'Parameter business is undefined'
             });
