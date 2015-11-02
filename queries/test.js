@@ -4,4 +4,4 @@
 
 var manager = require('./manager');
 
-manager.test('example');
+manager.test('finding_hotspot');

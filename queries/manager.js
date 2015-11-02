@@ -2,6 +2,7 @@
 'use strict';
 
 var example = require('./example');
+var finding_hotspot = require('./finding_hotspot');
 
 module.exports = {
     do: function(algorithm, parameters, callback) {
@@ -9,6 +10,8 @@ module.exports = {
             case 'example':
                 example.get(parameters, callback);
                 break;
+            case 'finding_hotspot':
+                finding_hotspot.get(parameters, callback);
             default:
                 callback({
                     error: 'Query does not exist'
@@ -20,6 +23,8 @@ module.exports = {
             case 'example':
                 example.test(); // For the tests we don't use parameters, we directly modify the file containing the algorithm.
                 break;
+            case 'finding_hotspot':
+                finding_hotspot.test();
             default:
                 console.log('This algorithm does not exist');
         }
