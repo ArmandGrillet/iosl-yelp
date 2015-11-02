@@ -12,6 +12,7 @@ module.exports = {
                 break;
             case 'finding_hotspot':
                 finding_hotspot.get(parameters, callback);
+                break;
             default:
                 callback({
                     error: 'Query does not exist'
@@ -25,6 +26,7 @@ module.exports = {
                 break;
             case 'finding_hotspot':
                 finding_hotspot.test();
+                break;
             default:
                 console.log('This algorithm does not exist');
         }
