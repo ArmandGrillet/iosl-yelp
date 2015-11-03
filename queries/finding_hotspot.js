@@ -42,6 +42,7 @@ function uniqueHotspots(hotspots) { //Function to make the array with unique val
 
 function get_hotspots(longitude, latitude) {
     var relative_distance; //Relative distance from other Restaurants
+    var hotspot_count_value = 10;
     var hotspots = [];
     var temp_hotspots = [];
     var hotspot_cluster_shop_list = [];
@@ -51,13 +52,13 @@ function get_hotspots(longitude, latitude) {
         hotspot_count = 0;
         for (var j = 0; j < longitude.length; j++) {
             relative_distance = distance(latitude[i], longitude[i], latitude[j], longitude[j], 'K'); // calculating distance in KMs between two points on map
-            if (relative_distance < 1.5 && relative_distance > 0) { //We have taken distance 1.5 KM if the shops are neighbouring
+            if (relative_distance < 3 && relative_distance > 0) { //We have taken distance 1.5 KM if the shops are neighbouring
                 hotspot_count = hotspot_count + 1;
                 temp_hotspots.push({
                     'latitude': latitude[j],
                     'longitude': longitude[j]
                 });
-                if (hotspot_count > 6) { //capturing the coordinates when it is considered a hotspot cluster, '=' because we just want to add once
+                if (hotspot_count > hotspot_count_value) { //capturing the coordinates when it is considered a hotspot cluster, '=' because we just want to add once
                     hotspot_cluster_shop_list.push({ //Adding it to Cluster shop list
                         'latitude': latitude[j],
                         'longitude': longitude[j]
@@ -69,7 +70,7 @@ function get_hotspots(longitude, latitude) {
                 }
             }
         }
-        if (hotspot_count > 6) {
+        if (hotspot_count > hotspot_count_value) {
             for(
             var temp of temp_hotspots){
             hotspots.push({
@@ -85,7 +86,7 @@ function get_hotspots(longitude, latitude) {
             hotspot_cluster_shop_list = [];
         }
         temp_hotspots = [];
-        if (hotspot_count > 6) { //capturing the coordinates of base shop from where we were calculating distances from other shops
+        if (hotspot_count > hotspot_count_value) { //capturing the coordinates of base shop from where we were calculating distances from other shops
             hotspots.push({
                 'latitude': latitude[i],
                 'longitude': longitude[i]
@@ -97,7 +98,7 @@ function get_hotspots(longitude, latitude) {
             hotspot_cluster_shop_list = uniqueHotspots(hotspot_cluster_shop_list);
             console.log('Found a cluster with ' + hotspot_count + ' shops ' + hotspot_cluster_shop_list.length);
         }
-        if (hotspot_count > 6) { //Here we are adding the all the shops in the cluster list and sending them to the function to get the mean of there cluster
+        if (hotspot_count > hotspot_count_value) { //Here we are adding the all the shops in the cluster list and sending them to the function to get the mean of there cluster
             var temp_coordinates = [];
             temp_coordinates = meanHotspotPoint(hotspot_cluster_shop_list);
             for(
@@ -110,8 +111,8 @@ function get_hotspots(longitude, latitude) {
         }
         hotspot_cluster_shop_list = [];
     }
-    //meanHotspotsList(hotspot_cluster_mean_point_list);
-    return uniqueHotspots(hotspots);
+    return uniqueHotspots(meanHotspotsList(hotspot_cluster_mean_point_list)); // returning mean list of all clusters with unique value
+    //return uniqueHotspots(hotspots);
 }
 
 function meanHotspotsList(hotspot_cluster_mean_point_list) {
@@ -167,15 +168,20 @@ module.exports = {
         } else {
             list_of_shops_in_a_category(parameters.city, parameters.business, function(hotspot) {
                 var answer = {
+                    circles: [],
                     markers: []
                 };
                 for (var i = 0; i < hotspot.length; i++) {
-                    answer.markers.push({
+                    answer.circles.push({
                         latitude: hotspot[i].latitude,
                         longitude: hotspot[i].longitude,
-                        popup: hotspot[i].name
+                        radius: 500,
+                        popup: "Hostspot for " + parameters.business,
+                        options: {
+                            stroke: false,
+                            fillColor: "#FF0000"
+                        }
                     });
-                    console.log("%%%%%%" + hotspot[i].latitude);
                 }
                 callback(answer);
             });
