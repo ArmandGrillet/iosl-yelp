@@ -1,5 +1,5 @@
 var map;
-var markers;
+var markersLayer;
 var cities = {
     'Pittsburgh': {
         latitude: 40.440625,
@@ -41,7 +41,7 @@ var cities = {
 
 window.onload = function() {
     map = L.map('map').setView([cities.Phoenix.latitude, cities.Phoenix.longitude], 15);
-    markers = new L.FeatureGroup().addTo(map);
+    markersLayer = new L.LayerGroup().addTo(map);
 
     // Downloading the map layer
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -49,6 +49,8 @@ window.onload = function() {
         maxZoom: 18,
         attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
+
+    $('#clean').on('click', clearLayers);
 
     $('#run-request').on('click', function() {
         var request = $('#request').val();
@@ -81,10 +83,15 @@ window.onload = function() {
     });
 };
 
+function clearLayers() {
+    markersLayer.clearLayers();
+}
+
 function display(data) {
     if (data.error !== undefined) {
         console.log(data.error);
     } else {
+        markersLayer.clearLayers(); // We clean the map
         var position, poup; // Position and popup of an element.
         var i; // Loop to go through the elements.
         if (data.position !== undefined) {
@@ -108,10 +115,10 @@ function display(data) {
                 if (markerParameters.popup !== '') {
                     popup = markerParameters.popup;
                     delete markerParameters.popup;
-                    var marker = L.marker([position.latitude, position.longitude], markerParameters.options).addTo(map);
+                    var marker = L.marker([position.latitude, position.longitude], markerParameters.options).addTo(markersLayer);
                     marker.bindPopup(popup);
                 } else {
-                    L.marker([position.latitude, position.longitude], markerParameters.options).addTo(map);
+                    L.marker([position.latitude, position.longitude], markerParameters.options).addTo(markersLayer);
                 }
             }
         }
@@ -133,10 +140,10 @@ function display(data) {
                 if (circleParameters.popup !== '') {
                     popup = circleParameters.popup;
                     delete circleParameters.popup;
-                    var circle = L.circle([position.latitude, position.longitude], radius, circleParameters.options).addTo(map);
+                    var circle = L.circle([position.latitude, position.longitude], radius, circleParameters.options).addTo(markersLayer);
                     circle.bindPopup(popup);
                 } else {
-                    L.marker([position.latitude, position.longitude], radius, circleParameters.options).addTo(map);
+                    L.marker([position.latitude, position.longitude], radius, circleParameters.options).addTo(markersLayer);
                 }
             }
         }
@@ -154,10 +161,10 @@ function display(data) {
                 if (polygonParameters.popup !== '') {
                     popup = polygonParameters.popup;
                     delete polygonParameters.popup;
-                    var polygon = L.polygon(points, polygonParameters.options).addTo(map);
+                    var polygon = L.polygon(points, polygonParameters.options).addTo(markersLayer);
                     polygon.bindPopup(polygonParameters.popup);
                 } else {
-                    L.polygon(points, polygonParameters.options).addTo(map);
+                    L.polygon(points, polygonParameters.options).addTo(markersLayer);
                 }
             }
         }
