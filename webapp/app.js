@@ -14,8 +14,6 @@ app.get('/mapquery', function(req, res) {
     var query = req.query;
     var algorithm = query.algorithm;
     delete query.algorithm;
-    console.log(algorithm);
-    console.log(query);
     queriesManager.do(algorithm, query, function(result) {
         res.send(result);
     });

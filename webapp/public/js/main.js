@@ -40,7 +40,7 @@ var cities = {
 };
 
 window.onload = function() {
-    map = L.map('map').setView([cities.Phoenix.latitude, cities.Phoenix.longitude], 15);
+    map = L.map('map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15);
     markersLayer = new L.LayerGroup().addTo(map);
 
     // Downloading the map layer
@@ -151,20 +151,20 @@ function display(data) {
         if (data.polygons !== undefined) {
             var polygons = data.polygons;
             for (i = 0; i < polygons.length; i++) {
-                var polygonParameters = polygons[i];
                 var points = [];
-                for (var j = 0; j < polygonParameters.points.length; j++) {
-                    points.push([polygonParameters.points[j].latitude, polygonParameters.points[j].longitude]);
+                for (var j = 0; j < polygons[i].points.length; j++) {
+                    points.push([parseFloat(polygons[i].points[j].latitude), parseFloat(polygons[i].points[j].longitude)]);
                 }
-                delete polygonParameters.points;
-
-                if (polygonParameters.popup !== '') {
-                    popup = polygonParameters.popup;
-                    delete polygonParameters.popup;
-                    var polygon = L.polygon(points, polygonParameters.options).addTo(markersLayer);
-                    polygon.bindPopup(polygonParameters.popup);
+                delete polygons[i].points;
+                console.log(JSON.stringify(points));
+                console.log(polygons[i].popup);
+                if (polygons[i].popup !== '') {
+                    popup = polygons[i].popup;
+                    delete polygons[i].popup;
+                    var polygon = L.polygon(points, polygons[i].options).addTo(markersLayer);
+                    polygon.bindPopup(popup);
                 } else {
-                    L.polygon(points, polygonParameters.options).addTo(markersLayer);
+                    L.polygon(points, polygons[i].options).addTo(markersLayer);
                 }
             }
         }
