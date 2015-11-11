@@ -2,7 +2,7 @@
 'use strict';
 
 var example = require('./example');
-var grid = require('./grid');
+var grid_example = require('./grid_example');
 var finding_hotspot = require('./finding_hotspot');
 
 module.exports = {
@@ -14,8 +14,8 @@ module.exports = {
             case 'finding_hotspot':
                 finding_hotspot.get(parameters, callback);
                 break;
-            case 'grid':
-                grid.get(parameters, callback);
+            case 'grid_example':
+                grid_example.get(parameters, callback);
                 break;
             default:
                 callback({
