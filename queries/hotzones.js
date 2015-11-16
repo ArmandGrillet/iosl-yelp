@@ -48,9 +48,8 @@ module.exports = {
                     ratioCheckins[i] = [];
                     for (j = 0; j < grid[i].length; j++) {
                         if (grid[i][j].business_ids.length >= 2) { // There is at least 2 businesses in the area.
-
                             for (var k = 0; k < grid[i][j].business_ids.length; k++) {
-                                ratioCheckins[i][j] += sum[business_ids[k]] / total_sum;
+                                ratioCheckins[i][j] += sum[grid[i][j].business_ids[k]] / total_sum;
                             }
                             if (ratioCheckins[i][j] > ratioMax)
                                 ratioMax = ratioCheckins[i][j];
@@ -75,7 +74,6 @@ module.exports = {
                 console.log(answer);
                 callback(answer);
             });
-            callback(answer);
         });
     },
     test: function() {

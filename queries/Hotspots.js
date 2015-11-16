@@ -43,7 +43,8 @@ function hotspotsNearLocalization(longitude, latitude) {
     var relative_distance; //Relative distance from other Restaurants
     var hotspots = [];
     var hotspot_count = 0; //Hotspot count to count the number of shops around for which we have chosen 5, so if cluster has more than 5 shops it's an Hotspot region
-    for (var i = 1; i < longitude.length; i++) { //loop to iterate through the list of latitudes and longitudes and calculate distance between them
+    var i;
+    for (i = 1; i < longitude.length; i++) { //loop to iterate through the list of latitudes and longitudes and calculate distance between them
         hotspot_count = 0;
         for (var j = 1; j < longitude.length; j++) {
             relative_distance = distance(latitude[i], longitude[i], latitude[j], longitude[j], 'K'); // calculating distance in KMs between two points on map
@@ -61,7 +62,7 @@ function hotspotsNearLocalization(longitude, latitude) {
         console.log('Found a cluster with ' + hotspot_count + ' shops');
     }
 
-    for (var i = 0; i < hotspots.length; i++) {
+    for (i = 0; i < hotspots.length; i++) {
         console.log("Latitude and longitude which are close to each other " + hotspots[i].latitude + " - " + hotspots[i].longitude);
     }
 }
