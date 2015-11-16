@@ -9,39 +9,52 @@ function getCheckinsByBusinessId(city, callback) {
 }
 
 // var to be used in 2 functions so they're put here as global
-var sum = 0; // number of checkins for one business
-var min_value = 0; // minimum number of checkins per business
-var max_value = 0; // maximum number of checkins per business
+var sum = []; // number of checkins for one business
+//var min_value = 0; // minimum number of checkins per business
+//var max_value = 0; // maximum number of checkins per business
 var total_sum = 0; // total number of checkins in every business of the city
 
 module.exports = {
     get: function(parameters, callback) {
         getCheckinsByBusinessId(parameters.city, function(businesses) {
 
+            for (var init = 0; init < businesses.length; init++) {
+                sum[businesses[init].business_id] = 0;
+            }
             for (var i = 0; i < businesses.length; i++) {
-                sum[businesses[i].business_id] = 0;
                 checkin = JSON.parse(businesses[i].checkin_info);
                 for (var key in checkin) {
                     sum[businesses[i].business_id] += checkin[key];
                 }
-                if (sum[businesses[i].business_id] > max_value)
-                    max_value = sum[businesses[i].business_id];
-                if (sum[businesses[i].business_id] < min_value)
-                    min_value = sum[businesses[i].business_id];
+
+                //            if (sum[businesses[i].business_id] > max_value)
+                //                max_value = sum[businesses[i].business_id];
+                //            if (sum[businesses[i].business_id] < min_value)
+                //                min_value = sum[businesses[i].business_id];
+
                 total_sum += sum[businesses[i].business_id];
+
             }
 
             utils.getGrid(parameters.city, function(grid) {
                 var gridPolygons = [];
                 var ratioCheckins = []; // number of checkins per grid[][] divided by total number of checkins
-                var ratioMax;
-                var ratioMin;
+                var ratioMax = 0;
+                var ratioMin = 0;
 
                 // ratioMin and ratioMax are initialized to the value of the first grid[][]
-                for (var count = 0; count < grid[0][0].business_ids.length; count++) {
-                    ratioMax += sum[business_ids[count]] / total_sum;
+                //for (var count = 0; count < grid[0][0].business_ids.length; count++) {
+                //    ratioMax += sum[business_ids[count]] / total_sum;
+                //}
+                //ratioMin = ratioMax;
+
+                // fill ratioCheckins with 0 for the += operation
+                for (i = 0; i < grid.length; i++) {
+                    ratioCheckins[i] = [];
+                    for (j = 0; j < grid[i].length; j++) {
+                        ratioCheckins[i][j] = 0;
+                    }
                 }
-                ratioMin = ratioMax;
 
                 // browsing the grid
                 for (i = 0; i < grid.length; i++) { // 0.001° = 111.32 m
@@ -53,18 +66,19 @@ module.exports = {
                             }
                             if (ratioCheckins[i][j] > ratioMax)
                                 ratioMax = ratioCheckins[i][j];
-                            if (ratioCheckins[i][j] < ratioMin)
-                                ratioMin = ratioCheckins[i][j];
-
+                            //if (ratioCheckins[i][j] < ratioMin)
+                            //    ratioMin = ratioCheckins[i][j];
+                            console.log("ratioMax: " + ratioMax);
                             gridPolygons.push({
                                 points: grid[i][j].points,
                                 popup: grid[i][j].business_ids.length.toString(),
                                 options: {
                                     fill: true,
                                     fillColor: "#FF0000",
-                                    fillOpacity: (ratioCheckins[i][j] - ratioMin) / ratioMax //normalization of the value so that it will be between 0 and 1
+                                    fillOpacity: (1 - (ratioCheckins[i][j] / ratioMax)) //normalization of the value so that it will be between 0 and 1
                                 }
                             });
+
                         }
                     }
                 }
