@@ -36,6 +36,8 @@ module.exports = {
             utils.getGrid(parameters.city, function(grid) {
                 var gridPolygons = [];
                 var ratioCheckins = []; // number of checkins per grid[][] divided by total number of checkins
+                var ratioMax = 0;
+                var ratioMin = 0;
                 var maxBusinesses = 0;
 
                 // ratioMin and ratioMax are initialized to the value of the first grid[][]
@@ -46,7 +48,9 @@ module.exports = {
 
                 // fill ratioCheckins with 0 for the += operation
                 for (i = 0; i < grid.length; i++) {
+                    ratioCheckins[i] = [];
                     for (j = 0; j < grid[i].length; j++) {
+                        ratioCheckins[i][j] = 0;
                         if (maxBusinesses < grid[i][j].business_ids.length) {
                             maxBusinesses = grid[i][j].business_ids.length;
                         }
@@ -58,7 +62,13 @@ module.exports = {
                     ratioCheckins[i] = [];
                     for (j = 0; j < grid[i].length; j++) {
                         if (grid[i][j].business_ids.length >= 2) { // There is at least 2 businesses in the area.
-                            console.log("opacity: " + (grid[i][j].business_ids.length / maxBusinesses));
+                            for (var k = 0; k < grid[i][j].business_ids.length; k++) {
+                                ratioCheckins[i][j] += sum[grid[i][j].business_ids[k]] / total_sum;
+                            }
+                            if (ratioCheckins[i][j] > ratioMax)
+                                ratioMax = ratioCheckins[i][j];
+                            //if (ratioCheckins[i][j] < ratioMin)
+                            //    ratioMin = ratioCheckins[i][j];
                             gridPolygons.push({
                                 points: grid[i][j].points,
                                 popup: grid[i][j].business_ids.length.toString(),
@@ -66,7 +76,7 @@ module.exports = {
                                     stroke: false,
                                     fill: true,
                                     fillColor: "#FF0000",
-                                    fillOpacity: (grid[i][j].business_ids.length / maxBusinesses) //normalization of the value so that it will be between 0 and 1
+                                    fillOpacity: (grid[i][j].business_ids.length / maxBusinesses)
                                 }
                             });
 
