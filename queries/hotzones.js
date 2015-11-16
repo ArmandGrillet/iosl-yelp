@@ -26,21 +26,17 @@ module.exports = {
                 for (var key in checkin) {
                     sum[businesses[i].business_id] += checkin[key];
                 }
-
                 //            if (sum[businesses[i].business_id] > max_value)
                 //                max_value = sum[businesses[i].business_id];
                 //            if (sum[businesses[i].business_id] < min_value)
                 //                min_value = sum[businesses[i].business_id];
-
                 total_sum += sum[businesses[i].business_id];
-
             }
 
             utils.getGrid(parameters.city, function(grid) {
                 var gridPolygons = [];
                 var ratioCheckins = []; // number of checkins per grid[][] divided by total number of checkins
-                var ratioMax = 0;
-                var ratioMin = 0;
+                var maxBusinesses = 0;
 
                 // ratioMin and ratioMax are initialized to the value of the first grid[][]
                 //for (var count = 0; count < grid[0][0].business_ids.length; count++) {
@@ -50,9 +46,10 @@ module.exports = {
 
                 // fill ratioCheckins with 0 for the += operation
                 for (i = 0; i < grid.length; i++) {
-                    ratioCheckins[i] = [];
                     for (j = 0; j < grid[i].length; j++) {
-                        ratioCheckins[i][j] = 0;
+                        if (maxBusinesses < grid[i][j].business_ids.length) {
+                            maxBusinesses = grid[i][j].business_ids.length;
+                        }
                     }
                 }
 
@@ -61,21 +58,15 @@ module.exports = {
                     ratioCheckins[i] = [];
                     for (j = 0; j < grid[i].length; j++) {
                         if (grid[i][j].business_ids.length >= 2) { // There is at least 2 businesses in the area.
-                            for (var k = 0; k < grid[i][j].business_ids.length; k++) {
-                                ratioCheckins[i][j] += sum[grid[i][j].business_ids[k]] / total_sum;
-                            }
-                            if (ratioCheckins[i][j] > ratioMax)
-                                ratioMax = ratioCheckins[i][j];
-                            //if (ratioCheckins[i][j] < ratioMin)
-                            //    ratioMin = ratioCheckins[i][j];
-                            console.log("ratioMax: " + ratioMax);
+                            console.log("opacity: " + (grid[i][j].business_ids.length / maxBusinesses));
                             gridPolygons.push({
                                 points: grid[i][j].points,
                                 popup: grid[i][j].business_ids.length.toString(),
                                 options: {
+                                    stroke: false,
                                     fill: true,
                                     fillColor: "#FF0000",
-                                    fillOpacity: (1 - (ratioCheckins[i][j] / ratioMax)) //normalization of the value so that it will be between 0 and 1
+                                    fillOpacity: (grid[i][j].business_ids.length / maxBusinesses) //normalization of the value so that it will be between 0 and 1
                                 }
                             });
 
@@ -85,7 +76,6 @@ module.exports = {
                 var answer = {
                     polygons: gridPolygons
                 };
-                console.log(answer);
                 callback(answer);
             });
         });
