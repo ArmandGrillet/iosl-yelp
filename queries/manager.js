@@ -4,6 +4,7 @@
 var example = require('./example');
 var grid_example = require('./grid_example');
 var finding_hotspot = require('./finding_hotspot');
+var hotzones = require('./hotzones');
 
 module.exports = {
     do: function(algorithm, parameters, callback) {
@@ -16,6 +17,9 @@ module.exports = {
                 break;
             case 'grid_example':
                 grid_example.get(parameters, callback);
+                break;
+            case 'hotzones':
+                hotzones.get(parameters, callback);
                 break;
             default:
                 callback({
@@ -30,6 +34,9 @@ module.exports = {
                 break;
             case 'finding_hotspot':
                 finding_hotspot.test();
+                break;
+            case 'hotzones':
+                hotzones.test();
                 break;
             default:
                 console.log('This algorithm does not exist');
