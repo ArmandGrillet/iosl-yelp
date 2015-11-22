@@ -9,9 +9,9 @@ var cities = {
         latitude: 35.227087,
         longitude: -80.843127
     },
-    'Urbana-Champaign': {
-        latitude: 40.110588,
-        longitude: -88.207270
+    'Champaign': {
+        latitude: 40.11642,
+        longitude: -88.24338
     },
     'Phoenix': {
         latitude: 33.448377,
@@ -28,6 +28,10 @@ var cities = {
     'Montreal': {
         latitude: 45.501689,
         longitude: -73.567256
+    },
+    'Waterloo': {
+        latitude: 43.4668000,
+        longitude: -80.5163900
     },
     'Karlsruhe': {
         latitude: 49.006890,

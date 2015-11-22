@@ -3,6 +3,7 @@
 
 var request = require('request');
 var path = require('path');
+var fs = require('fs');
 
 function gridForBusinesses(businesses) {
     var i, j;
@@ -64,8 +65,35 @@ function gridForBusinesses(businesses) {
             }
         }
     }
-
     return grid;
+}
+
+function writeGrid(city, grid) {
+    var json = {
+        "type": "FeatureCollection",
+        "features": []
+    };
+    var i, j;
+    for (i = 0; i < grid.length; i++) {
+        for (j = 0; j < grid[i].length; j++) {
+            json.features.push({
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [grid[i][j].points[0].latitude, grid[i][j].points[0].longitude],
+                        [grid[i][j].points[1].latitude, grid[i][j].points[1].longitude],
+                        [grid[i][j].points[2].latitude, grid[i][j].points[2].longitude],
+                        [grid[i][j].points[3].latitude, grid[i][j].points[3].longitude]
+                    ]
+                },
+                "properties": {
+                    "business_ids": grid[i][j].business_ids
+                }
+            });
+        }
+    }
+    fs.writeFileSync('../queries/geojson/' + city + '.geojson', JSON.stringify(json));
 }
 
 module.exports = {
@@ -90,7 +118,8 @@ module.exports = {
     },
     getGrid: function(city, callback) {
         this.askDrill("select business_id, latitude, longitude from " + this.datasetPath('business') + " where city='" + city + "'", function(answer) {
-            return callback(gridForBusinesses(answer.rows));
+            var grid = gridForBusinesses(answer.rows);
+            return callback(grid);
         });
     },
     getGridForCategory: function(city, category, callback) {

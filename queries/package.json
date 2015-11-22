@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "path": "latest",
-    "request": "latest"
+    "request": "latest",
+    "fs": "latest"
   },
   "author": "",
   "license": "ISC"
