@@ -19,6 +19,15 @@ app.get('/mapquery', function(req, res) {
     });
 });
 
+app.get('/infoquery', function(req, res) {
+    var query = req.query;
+    var algorithm = query.algorithm;
+    delete query.algorithm;
+    queriesManager.do(algorithm, query, function(result) {
+        res.send(result);
+    });
+});
+
 var server = app.listen(1337, function() {
     var port = server.address().port;
 

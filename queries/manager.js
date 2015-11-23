@@ -1,14 +1,19 @@
 /*jslint node: true */
 'use strict';
 
+var businesses = require('./businesses');
 var example = require('./example');
 var grid_example = require('./grid_example');
 var finding_hotspot = require('./finding_hotspot');
 var hotzones = require('./hotzones');
+var info = require('./info');
 
 module.exports = {
     do: function(algorithm, parameters, callback) {
         switch (algorithm) {
+            case 'businesses':
+                businesses.get(parameters, callback);
+                break;
             case 'example':
                 example.get(parameters, callback);
                 break;
@@ -21,6 +26,9 @@ module.exports = {
             case 'hotzones':
                 hotzones.get(parameters, callback);
                 break;
+            case 'info':
+                info.get(parameters, callback);
+                break;
             default:
                 callback({
                     error: 'Query does not exist'
@@ -29,6 +37,9 @@ module.exports = {
     },
     test: function(algorithm) {
         switch (algorithm) {
+            case 'businesses':
+                businesses.test();
+                break;
             case 'example':
                 example.test(); // For the tests we don't use parameters, we directly modify the file containing the algorithm.
                 break;
@@ -37,6 +48,9 @@ module.exports = {
                 break;
             case 'hotzones':
                 hotzones.test();
+                break;
+            case 'info':
+                info.test();
                 break;
             default:
                 console.log('This algorithm does not exist');

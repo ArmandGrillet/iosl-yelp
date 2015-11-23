@@ -82,8 +82,8 @@ window.onload = function() {
         }
     });
 
-    $('.radio').on('change', function() {
-        moveTo($("input[name='optionsRadios']:checked").val());
+    $(".select").change(function() {
+        moveTo($(this).children(":selected").val());
     });
 };
 
@@ -96,7 +96,7 @@ function display(data) {
         console.log(data.error);
     } else {
         markersLayer.clearLayers(); // We clean the map
-        var position, poup; // Position and popup of an element.
+        var position, popup, onclick; // Position and popup of an element.
         var i; // Loop to go through the elements.
         if (data.position !== undefined) {
             console.log(data.position);
@@ -107,6 +107,7 @@ function display(data) {
         }
         if (data.markers !== undefined) {
             var markers = data.markers;
+            var marker;
             for (i = 0; i < markers.length; i++) {
                 var markerParameters = markers[i];
                 position = {
@@ -114,16 +115,20 @@ function display(data) {
                     longitude: markerParameters.longitude
                 };
                 delete markerParameters.latitude;
-                delete markerParameters.latitude;
+                delete markerParameters.longitude;
 
-                if (markerParameters.popup !== '') {
+                marker = L.marker([position.latitude, position.longitude], markerParameters.options);
+                if (markerParameters.popup !== undefined) {
                     popup = markerParameters.popup;
                     delete markerParameters.popup;
-                    var marker = L.marker([position.latitude, position.longitude], markerParameters.options).addTo(markersLayer);
                     marker.bindPopup(popup);
-                } else {
-                    L.marker([position.latitude, position.longitude], markerParameters.options).addTo(markersLayer);
                 }
+                if (markerParameters.onclick !== undefined) {
+                    onclick = markerParameters.onclick;
+                    delete markerParameters.onclick;
+                    marker.on('click', markerClick);
+                }
+                marker.addTo(markersLayer);
             }
         }
 
@@ -203,6 +208,24 @@ function getNearestCity(latitude, longitude) {
         }
     }
     return nearestCity;
+}
+
+function markerClick(e) {
+    console.log(this);
+    if (this.options.alt !== undefined) {
+        var query = {};
+        query.latitude = map.getCenter().lat;
+        query.longitude = map.getCenter().lng;
+
+        query.city = getNearestCity(query.latitude, query.longitude);
+        query.algorithm = 'info';
+        query.business_id = this.options.alt;
+
+        $.get('/infoquery', query, function(data) {
+            console.log(data);
+            $('#marker-info').text(data.name + ": " + data.full_address);
+        });
+    }
 }
 
 function moveTo(city) {
