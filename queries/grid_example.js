@@ -24,7 +24,6 @@ module.exports = {
             var answer = {
                 polygons: gridPolygons
             };
-            console.log(answer);
             callback(answer);
         });
     },
