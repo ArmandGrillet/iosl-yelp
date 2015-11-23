@@ -160,8 +160,6 @@ function display(data) {
                     points.push([parseFloat(polygons[i].points[j].latitude), parseFloat(polygons[i].points[j].longitude)]);
                 }
                 delete polygons[i].points;
-                console.log(JSON.stringify(points));
-                console.log(polygons[i].popup);
                 if (polygons[i].popup !== '') {
                     popup = polygons[i].popup;
                     delete polygons[i].popup;

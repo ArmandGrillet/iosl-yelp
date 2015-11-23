@@ -10,15 +10,31 @@ module.exports = {
     get: function(parameters, callback) {
         utils.getGrid(parameters.city, function(grid) {
             var gridPolygons = [];
-            for (i = 0; i < grid.length; i++) { // 0.001° = 111.32 m
-                for (j = 0; j < grid[i].length; j++) {
-                    if (grid[i][j].business_ids.length >= 2) { // There is at least 2 businesses in the area.
-                        gridPolygons.push({
-                            points: grid[i][j].points,
-                            popup: grid[i][j].business_ids.length.toString(),
-                            options: {}
-                        });
-                    }
+            var i;
+            for (i = 0; i < grid.features.length; i++) {
+                if (grid.features[i].properties.business_ids.length >= 2) { // There is at least 2 businesses in the area.
+                    gridPolygons.push({
+                        points: [
+                            {
+                                latitude: grid.features[i].geometry.coordinates[0][0],
+                                longitude: grid.features[i].geometry.coordinates[0][1]
+                            },
+                            {
+                                latitude: grid.features[i].geometry.coordinates[1][0],
+                                longitude: grid.features[i].geometry.coordinates[1][1]
+                            },
+                            {
+                                latitude: grid.features[i].geometry.coordinates[2][0],
+                                longitude: grid.features[i].geometry.coordinates[2][1]
+                            },
+                            {
+                                latitude: grid.features[i].geometry.coordinates[3][0],
+                                longitude: grid.features[i].geometry.coordinates[3][1]
+                            }
+                        ],
+                        popup: grid.features[i].properties.business_ids.length.toString(),
+                        options: {}
+                    });
                 }
             }
             var answer = {

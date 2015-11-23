@@ -119,11 +119,8 @@ module.exports = {
         return 'dfs.`' + path.normalize(__dirname + '/../../yelp_dataset_challenge_academic_dataset/') + 'yelp_academic_dataset_' + dataset + '.json`';
     },
     getGrid: function(city, callback) {
-        this.askDrill("select business_id, latitude, longitude from " + this.datasetPath('business') + " where city='" + city + "'", function(answer) {
-            var grid = gridForBusinesses(answer.rows);
-            // writeGrid(city, grid);
-            return callback(grid);
-        });
+        var grid = JSON.parse(fs.readFileSync('../queries/geojson/' + city + '.geojson', 'utf8'));
+        return callback(grid);
     },
     getGridForCategory: function(city, category, callback) {
         this.askDrill("select business_id, latitude, longitude from " + this.datasetPath('business') + " where city='" + city + "'", function(answer) {
