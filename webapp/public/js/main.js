@@ -214,16 +214,11 @@ function markerClick(e) {
     console.log(this);
     if (this.options.alt !== undefined) {
         var query = {};
-        query.latitude = map.getCenter().lat;
-        query.longitude = map.getCenter().lng;
-
-        query.city = getNearestCity(query.latitude, query.longitude);
         query.algorithm = 'info';
         query.business_id = this.options.alt;
 
         $.get('/infoquery', query, function(data) {
-            console.log(data);
-            $('#marker-info').text(data.name + ": " + data.full_address);
+            $('#marker-info').text(JSON.stringify(data));
         });
     }
 }
