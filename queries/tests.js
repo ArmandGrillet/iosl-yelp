@@ -4,4 +4,5 @@
 
 var manager = require('./manager');
 
-manager.test('hotzones');
+// Write your tests here.
+manager.test('using_public_transports');

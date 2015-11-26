@@ -7,6 +7,7 @@ var grid_example = require('./grid_example');
 var finding_hotspot = require('./finding_hotspot');
 var hotzones = require('./hotzones');
 var info = require('./info');
+var using_public_transports = require('./using_public_transports');
 
 module.exports = {
     do: function(algorithm, parameters, callback) {
@@ -51,6 +52,9 @@ module.exports = {
                 break;
             case 'info':
                 info.test();
+                break;
+            case 'using_public_transports':
+                using_public_transports.test();
                 break;
             default:
                 console.log('This algorithm does not exist');

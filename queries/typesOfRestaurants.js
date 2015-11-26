@@ -1,7 +1,6 @@
 var request = require('request');
 var path = require('path');
 
-
 function datasetPath(dataset) {
     return 'dfs.`' + path.normalize(__dirname + '/../../yelp_dataset_challenge_academic_dataset/') + 'yelp_academic_dataset_' + dataset + '.json`';
 }
