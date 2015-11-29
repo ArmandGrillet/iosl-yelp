@@ -69,7 +69,6 @@ function success_factor(list_of_businesses) {
             'score': ((parseFloat(list_of_businesses[j].total_checkin / max_checkin) + parseFloat(list_of_businesses[j].stars / max_stars) + parseFloat(list_of_businesses[j].review_count / max_review_count)) / 3)
         });
     }
-    console.log("*****success score is " + success_score[0].score);
     return success_score;
 }
 function retTransport(transport) {
@@ -100,8 +99,6 @@ function cal_success_business(city, business, callback) {
             'longitude': row.longitude
         });
         }
-        console.log("Length is " + list_of_businesses.length);
-        //callback(getTransport());
         callback(success_factor(list_of_businesses));
     });
 }
@@ -127,11 +124,8 @@ module.exports = {
                 error: 'Parameter business is undefined'
             });
         } else {
-
             cal_success_business(parameters.city, parameters.business, function(list_of_businesses) {
-
-
-                getTransports(parameters.city, callback, function(transports) {
+                getTransports(parameters.city, function(transports) {
                     var answer = {
                         circles: [],
                         markers: []
@@ -139,61 +133,57 @@ module.exports = {
                     var temp = transports[0];
                     var temp_nearest_transport = 0;
                     var transport_coordinates = [];
-                    console.log("temp is " + temp.lat);
+                    console.log("temp is " + temp.tags.highway);
                     var final_list = [];
                     for (var j = 0; j < list_of_businesses.length; j++) {
                         for (var i = 0; i < transports.length; i++) {
                             var distances = distance(transports[i].lat, transports[i].lon, list_of_businesses[j].latitude, list_of_businesses[j].longitude, 'K');
                             if (i === 0) {
-                                temp_nearest_transport = distances; console.log("Distance is " + temp_nearest_transport);
+                                temp_nearest_transport = distances;
                             }
                             if (distances < temp_nearest_transport) {
                                 temp_nearest_transport = distances;
                                 transport_coordinates = [];
                                 transport_coordinates.push({
                                     latitude: transports[i].lat,
-                                    longitude: transports[i].lon,
-                                    name: transports[i].tags
+                                    longitude: transports[i].lon
+                                    //name: transports[i].tags[2]
                                 });
                             }
                         }
                         final_list.push({
                             business: list_of_businesses[j],
-                            transport: transport_coordinates,
+                            transport_list: transport_coordinates[0],
                             distance: temp_nearest_transport
                         });
                     }
 
                     for (var l = 0; l < final_list.length; l++) {
-                        console.log("Hello " + final_list[l].distance);
                     }
 
                     for (var m = 0; m < final_list.length; m++) {
                         //squareInCircle(final_list[m].business.latitude, final_list[m].business.longitude, 200);
-                        console.log("Insiode   " + final_list[m].business.business_name);
                         answer.circles.push({
                             latitude: final_list[m].business.latitude,
                             longitude: final_list[m].business.longitude,
                             radius: 100,
-                            popup: final_list[m].business.business_name + " and success score is " + final_list[m].business.score,
+                            popup: final_list[m].business.business_name + " and success score is " + parseFloat(final_list[m].business.score).toFixed(2) + " and the transport is " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away",
                             options: {
                                 stroke: false,
                                 fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#FF00FF" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.3) ? "#0000FF" : "#FF0000")
                             }
                         });
                     }
+
                     for (var n = 0; n < final_list.length; n++) {
-                        console.log("final list " + final_list[n].distance);
                         answer.markers.push({
-                            latitude: final_list[n].transport.latitude,
-                            longitude: final_list[n].transport.longitude,
-                            popup: 'Transport',
+                            latitude: final_list[n].transport_list.latitude,
+                            longitude: final_list[n].transport_list.longitude,
+                            popup: 'Transport'
                         });
                     }
                     callback(answer);
                 });
-
-                //callback(answer);
             });
         }
     },
