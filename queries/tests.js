@@ -5,4 +5,4 @@
 var manager = require('./manager');
 
 // Write your tests here.
-manager.test('using_public_transports');
+manager.test('success_algo');
