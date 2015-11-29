@@ -8,7 +8,6 @@ var finding_hotspot = require('./finding_hotspot');
 var hotzones = require('./hotzones');
 var info = require('./info');
 var using_public_transports = require('./using_public_transports');
-var transport = require('./transport');
 var success_algo = require('./success_algo');
 
 module.exports = {
@@ -60,9 +59,6 @@ module.exports = {
                 break;
             case 'using_public_transports':
                 using_public_transports.test();
-                break;
-            case 'transport':
-                transport.test();
                 break;
             case 'success_algo':
                 success_algo.test();
