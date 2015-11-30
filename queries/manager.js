@@ -8,7 +8,7 @@ var finding_hotspot = require('./finding_hotspot');
 var hotzones = require('./hotzones');
 var info = require('./info');
 var using_public_transports = require('./using_public_transports');
-var success_algo = require('./success_algo');
+var success = require('./success');
 
 module.exports = {
     do: function(algorithm, parameters, callback) {
@@ -31,8 +31,8 @@ module.exports = {
             case 'info':
                 info.get(parameters, callback);
                 break;
-            case 'success_algo':
-                success_algo.get(parameters, callback);
+            case 'success':
+                success.get(parameters, callback);
                 break;
             default:
                 callback({
@@ -60,8 +60,8 @@ module.exports = {
             case 'using_public_transports':
                 using_public_transports.test();
                 break;
-            case 'success_algo':
-                success_algo.test();
+            case 'success':
+                success.test();
                 break;
             default:
                 console.log('This algorithm does not exist');
