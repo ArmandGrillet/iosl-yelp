@@ -5,4 +5,4 @@
 var manager = require('./manager');
 
 // Write your tests here.
-manager.test('success_algo');
+manager.test('success');
