@@ -77,7 +77,7 @@ function retTransport(transport) {
 }
 
 function getTransports(city, callback) {
-    var transports = fs.readFileSync(utils.path('edinburgh_transport'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_transport.json as a JSON file.
+    var transports = fs.readFileSync(utils.path('edinburgh_metro_bus'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_transport.json as a JSON file.
     callback(JSON.parse(transports));
 }
 
@@ -133,7 +133,7 @@ module.exports = {
                     var temp = transports[0];
                     var temp_nearest_transport = 0;
                     var transport_coordinates = [];
-                    console.log("temp is " + temp.tags.highway);
+                    console.log("temp is " + temp.railway);
                     var final_list = [];
                     for (var j = 0; j < list_of_businesses.length; j++) {
                         for (var i = 0; i < transports.length; i++) {
@@ -146,8 +146,8 @@ module.exports = {
                                 transport_coordinates = [];
                                 transport_coordinates.push({
                                     latitude: transports[i].lat,
-                                    longitude: transports[i].lon
-                                    //name: transports[i].tags[2]
+                                    longitude: transports[i].lon,
+                                    t_type: transports[i].railway
                                 });
                             }
                         }
@@ -166,11 +166,11 @@ module.exports = {
                         answer.circles.push({
                             latitude: final_list[m].business.latitude,
                             longitude: final_list[m].business.longitude,
-                            radius: 100,
-                            popup: final_list[m].business.business_name + " and success score is " + parseFloat(final_list[m].business.score).toFixed(2) + " and the transport is " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away",
+                            radius: 200,
+                            popup: final_list[m].business.business_name + " and success score is " + parseFloat(final_list[m].business.score).toFixed(2) + " and the " + final_list[m].transport_list.t_type + " is " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away",
                             options: {
                                 stroke: false,
-                                fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#FF00FF" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.3) ? "#0000FF" : "#FF0000")
+                                fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#000000" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.3) ? "#0000FF" : "#FF0000")
                             }
                         });
                     }
@@ -179,7 +179,7 @@ module.exports = {
                         answer.markers.push({
                             latitude: final_list[n].transport_list.latitude,
                             longitude: final_list[n].transport_list.longitude,
-                            popup: 'Transport'
+                            popup: final_list[n].transport_list.t_type
                         });
                     }
                     callback(answer);
@@ -193,23 +193,25 @@ module.exports = {
                 var temp = transports[0];
                 var temp_nearest_transport = 0;
                 var transport_coordinates = [];
-                console.log("temp is " + temp.lat);
+                console.log("temp is " + temp.railway);
                 var final_list = [];
                 for (var j = 0; j < list_of_businesses.length; j++) {
-                    for (var i = 0; i < transports.length; i++) {
-                        var distances = distance(transports[i].lat, transports[i].lon, list_of_businesses[j].latitude, list_of_businesses[j].longitude, 'K');
-                        if (i === 0) {
-                            temp_nearest_transport = distances; //console.log("Distance is " + temp_nearest_transport);
-                        }
-                        if (distances < temp_nearest_transport) {
-                            temp_nearest_transport = distances;
-                            transport_coordinates = [];
-                            transport_coordinates.push({
-                                latitude: transports[i].lat,
-                                longitude: transports[i].lon,
-                                name: transports[i].tags
-                            });
-                            //console.log("Inside if Distance from " + transport_coordinates.latitude);
+                    if (transports.railway === 'bus_stop') {
+                        for (var i = 0; i < transports.length; i++) {
+                            var distances = distance(transports[i].lat, transports[i].lon, list_of_businesses[j].latitude, list_of_businesses[j].longitude, 'K');
+                            if (i === 0) {
+                                temp_nearest_transport = distances; //console.log("Distance is " + temp_nearest_transport);
+                            }
+                            if (distances < temp_nearest_transport) {
+                                temp_nearest_transport = distances;
+                                transport_coordinates = [];
+                                transport_coordinates.push({
+                                    latitude: transports[i].lat,
+                                    longitude: transports[i].lon,
+                                    t_type: transports[i].railway
+                                });
+                                console.log("Inside if Distance from " + transport_coordinates[0].latitude);
+                            }
                         }
                     }
                     final_list.push({
@@ -220,7 +222,7 @@ module.exports = {
                 }
 
                 for (var l = 0; l < final_list.length; l++) {
-                    console.log("Hello " + final_list[l].transport.name);
+                    console.log("Hello " + final_list[l].transport[0].latitude);
                 }
                 console.log("Length is " + list_of_businesses.length);
                 for (var k = 0; k < list_of_businesses.length; k++) {
