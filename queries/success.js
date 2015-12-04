@@ -80,6 +80,15 @@ function getTransports(city, callback) {
     var transports = fs.readFileSync(utils.path('edinburgh_metro_bus'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_transport.json as a JSON file.
     callback(JSON.parse(transports));
 }
+function getMuseums(city, callback) {
+    console.log("I'm here");
+    var museums = fs.readFileSync(utils.path('edinburgh_museum'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_museum.json as a JSON file.
+    callback(JSON.parse(museums));
+}
+function getLiquor(city, callback) {
+    var liquors = fs.readFileSync(utils.path('edinburgh_liquor'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_museum.json as a JSON file.
+    callback(JSON.parse(liquors));
+}
 
 
 function cal_success_business(city, business, callback) {
@@ -126,63 +135,119 @@ module.exports = {
         } else {
             cal_success_business(parameters.city, parameters.business, function(list_of_businesses) {
                 getTransports(parameters.city, function(transports) {
-                    var answer = {
-                        circles: [],
-                        markers: []
-                    };
-                    var temp = transports[0];
-                    var temp_nearest_transport = 0;
-                    var transport_coordinates = [];
-                    console.log("temp is " + temp.railway);
-                    var final_list = [];
-                    for (var j = 0; j < list_of_businesses.length; j++) {
-                        for (var i = 0; i < transports.length; i++) {
-                            var distances = distance(transports[i].lat, transports[i].lon, list_of_businesses[j].latitude, list_of_businesses[j].longitude, 'K');
-                            if (i === 0) {
-                                temp_nearest_transport = distances;
-                            }
-                            if (distances < temp_nearest_transport) {
-                                temp_nearest_transport = distances;
-                                transport_coordinates = [];
-                                transport_coordinates.push({
-                                    latitude: transports[i].lat,
-                                    longitude: transports[i].lon,
-                                    t_type: transports[i].railway
+                    getMuseums(parameters.city, function(museums) {
+                        getLiquor(parameters.city, function(liquors) {
+                            var answer = {
+                                circles: [],
+                                markers: []
+                            };
+                            var temp = transports[0];
+                            var temp_nearest_transport = 0;
+                            var transport_coordinates = [];
+                            console.log("temp is " + temp.railway);
+                            var final_list = [];
+                            for (var j = 0; j < list_of_businesses.length; j++) {
+                                for (var i = 0; i < transports.length; i++) {
+                                    var distances = distance(transports[i].lat, transports[i].lon, list_of_businesses[j].latitude, list_of_businesses[j].longitude, 'K');
+                                    if (i === 0) {
+                                        temp_nearest_transport = distances;
+                                    }
+                                    if (distances < temp_nearest_transport) {
+                                        temp_nearest_transport = distances;
+                                        transport_coordinates = [];
+                                        transport_coordinates.push({
+                                            latitude: transports[i].lat,
+                                            longitude: transports[i].lon,
+                                            t_type: transports[i].railway
+                                        });
+                                    }
+                                }
+                                final_list.push({
+                                    business: list_of_businesses[j],
+                                    transport_list: transport_coordinates[0],
+                                    distance: temp_nearest_transport,
+                                    museum: {},
+                                    liquor: {}
                                 });
                             }
-                        }
-                        final_list.push({
-                            business: list_of_businesses[j],
-                            transport_list: transport_coordinates[0],
-                            distance: temp_nearest_transport
-                        });
-                    }
-
-                    for (var l = 0; l < final_list.length; l++) {
-                    }
-
-                    for (var m = 0; m < final_list.length; m++) {
-                        //squareInCircle(final_list[m].business.latitude, final_list[m].business.longitude, 200);
-                        answer.circles.push({
-                            latitude: final_list[m].business.latitude,
-                            longitude: final_list[m].business.longitude,
-                            radius: 200,
-                            popup: final_list[m].business.business_name + " and success score is " + parseFloat(final_list[m].business.score).toFixed(2) + " and the " + final_list[m].transport_list.t_type + " is " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away",
-                            options: {
-                                stroke: false,
-                                fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#000000" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.3) ? "#0000FF" : "#FF0000")
+                            //Adding Museums
+                            var museums_list = museums;
+                            var museum_coordinates = [];
+                            var temp_nearest_museum = 0;
+                            for (var u = 0; u < list_of_businesses.length; u++) {
+                                for (var v = 0; v < museums_list.length; v++) {
+                                    var museum_distances = distance(museums_list[v].lat, museums_list[v].lon, list_of_businesses[u].latitude, list_of_businesses[u].longitude, 'K');
+                                    if (v === 0) {
+                                        temp_nearest_museum = museum_distances;
+                                    }
+                                    if (museum_distances < temp_nearest_museum) {
+                                        temp_nearest_museum = museum_distances;
+                                        museum_coordinates = [];
+                                        museum_coordinates.push({
+                                            latitude: museums_list[v].lat,
+                                            longitude: museums_list[v].lon,
+                                            t_type: "Museum",
+                                            m_dist: temp_nearest_museum
+                                        });
+                                    }
+                                }
+                                final_list[u].museum = museum_coordinates[0];
                             }
-                        });
-                    }
+                            //Adding Liquor stores
+                            var liquor_list = liquors;
+                            var liquor_coordinates = [];
+                            var temp_nearest_liquor = 0;
+                            for (var w = 0; w < list_of_businesses.length; w++) {
+                                for (var x = 0; x < liquor_list.length; x++) {
+                                    var liquor_distances = distance(liquor_list[x].lat, liquor_list[x].lon, list_of_businesses[w].latitude, list_of_businesses[w].longitude, 'K');
+                                    if (x === 0) {
+                                        temp_nearest_liquor = liquor_distances;
+                                    }
+                                    if (liquor_distances < temp_nearest_liquor) {
+                                        temp_nearest_liquor = liquor_distances;
+                                        liquor_coordinates = [];
+                                        liquor_coordinates.push({
+                                            latitude: liquor_list[x].lat,
+                                            longitude: liquor_list[x].lon,
+                                            t_type: "Liquor Shop",
+                                            l_dist: temp_nearest_liquor
+                                        });
+                                    }
+                                }
+                                final_list[w].liquor = liquor_coordinates[0];
+                            }
+                            //Museum and Business List on console
+                            console.log("Business_Stars, Business_Review_Count, Business_total_checkin, Business _Success_score, Transport distance, Museum _distance, liquor_distances");
+                            for (
+                            var m_list of final_list) {
+                            console.log(m_list.business.stars + ", " + m_list.business.review_count + ", " + m_list.business.total_checkin + ", " + m_list.business.score + ", " + (parseFloat(m_list.distance * 1000).toFixed(2)) + ", " + (parseFloat(m_list.museum.m_dist * 1000).toFixed(2)));
+                            }
 
-                    for (var n = 0; n < final_list.length; n++) {
-                        answer.markers.push({
-                            latitude: final_list[n].transport_list.latitude,
-                            longitude: final_list[n].transport_list.longitude,
-                            popup: final_list[n].transport_list.t_type
+
+                            for (var m = 0; m < final_list.length; m++) {
+                                //squareInCircle(final_list[m].business.latitude, final_list[m].business.longitude, 200);
+                                answer.circles.push({
+                                    latitude: final_list[m].business.latitude,
+                                    longitude: final_list[m].business.longitude,
+                                    radius: 200,
+                                    popup: final_list[m].business.business_name + " \n , Success score: " + parseFloat(final_list[m].business.score).toFixed(2) + " \n " + final_list[m].transport_list.t_type + " : " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away, \n Museum :  " + parseFloat(final_list[m].museum.m_dist * 1000).toFixed(2) + " meters away, Liquor shop : " + parseFloat(final_list[m].liquor.l_dist * 1000).toFixed(2) + " meters away",
+                                    options: {
+                                        stroke: false,
+                                        fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#000000" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.3) ? "#0000FF" : "#FF0000")
+                                    }
+                                });
+                            }
+
+                            for (var n = 0; n < final_list.length; n++) {
+                                answer.markers.push({
+                                    latitude: final_list[n].transport_list.latitude,
+                                    longitude: final_list[n].transport_list.longitude,
+                                    popup: final_list[n].transport_list.t_type
+                                });
+                            }
+                            callback(answer);
                         });
-                    }
-                    callback(answer);
+                    });
                 });
             });
         }
