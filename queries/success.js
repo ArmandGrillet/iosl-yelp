@@ -82,7 +82,7 @@ function getTransports(city, callback) {
 }
 function getMuseums(city, callback) {
     console.log("I'm here");
-    var museums = fs.readFileSync(utils.path('edinburgh_museum'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_museum.json as a JSON file.
+    var museums = fs.readFileSync(utils.path('edinburgh_attractions'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_museum.json as a JSON file.
     callback(JSON.parse(museums));
 }
 function getLiquor(city, callback) {
@@ -94,7 +94,6 @@ function getLiquor(city, callback) {
 function cal_success_business(city, business, callback) {
     console.log("Hello before");
     utils.askDrill("select business_id, name, total_checkin, stars, review_count, latitude, longitude from " + utils.datasetPath('edinburgh_info') + " where category='" + business + "'", function(answer) {
-        //  console.log("hello");
         var list_of_businesses = [];
         for (
         var row of answer.rows) {
@@ -170,7 +169,7 @@ module.exports = {
                                     liquor: {}
                                 });
                             }
-                            //Adding Museums
+                            //Adding Museums or attractions
                             var museums_list = museums;
                             var museum_coordinates = [];
                             var temp_nearest_museum = 0;
@@ -217,10 +216,10 @@ module.exports = {
                                 final_list[w].liquor = liquor_coordinates[0];
                             }
                             //Museum and Business List on console
-                            console.log("Business_Stars, Business_Review_Count, Business_total_checkin, Business _Success_score, Transport distance, Museum _distance, liquor_distances");
+                            console.log("Business_Stars, Business_Review_Count, Business_total_checkin, Business _Success_score, Transport distance, Attraction _distance, liquor_distances");
                             for (
                             var m_list of final_list) {
-                            console.log(m_list.business.stars + ", " + m_list.business.review_count + ", " + m_list.business.total_checkin + ", " + m_list.business.score + ", " + (parseFloat(m_list.distance * 1000).toFixed(2)) + ", " + (parseFloat(m_list.museum.m_dist * 1000).toFixed(2)));
+                            console.log(m_list.business.stars + ", " + m_list.business.review_count + ", " + m_list.business.total_checkin + ", " + (parseFloat(m_list.business.score * 1000).toFixed(2)) + ", " + (parseFloat(m_list.distance * 1000).toFixed(2)) + ", " + (parseFloat(m_list.museum.m_dist * 1000).toFixed(2)) + ", " + (parseFloat(m_list.liquor.l_dist * 1000).toFixed(2)));
                             }
 
 
@@ -229,11 +228,11 @@ module.exports = {
                                 answer.circles.push({
                                     latitude: final_list[m].business.latitude,
                                     longitude: final_list[m].business.longitude,
-                                    radius: 200,
-                                    popup: final_list[m].business.business_name + " \n , Success score: " + parseFloat(final_list[m].business.score).toFixed(2) + " \n " + final_list[m].transport_list.t_type + " : " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away, \n Museum :  " + parseFloat(final_list[m].museum.m_dist * 1000).toFixed(2) + " meters away, Liquor shop : " + parseFloat(final_list[m].liquor.l_dist * 1000).toFixed(2) + " meters away",
+                                    radius: 150,
+                                    popup: final_list[m].business.business_name + " \n , Success score: " + parseFloat(final_list[m].business.score).toFixed(2) + " \n " + final_list[m].transport_list.t_type + " : " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away, \n Attraction :  " + parseFloat(final_list[m].museum.m_dist * 1000).toFixed(2) + " meters away, Liquor shop : " + parseFloat(final_list[m].liquor.l_dist * 1000).toFixed(2) + " meters away",
                                     options: {
                                         stroke: false,
-                                        fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#000000" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.3) ? "#0000FF" : "#FF0000")
+                                        fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#ffff00" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.34) ? "#0000FF" : "#FF0000")
                                     }
                                 });
                             }
