@@ -1,37 +1,16 @@
 var utils = require('./utils');
 var fs = require('fs');
 
-function distance(lat1, lon1, lat2, lon2, unit) { //function to calculate the distance between two coordinates
-    var radlat1 = Math.PI * lat1 / 180;
-    var radlat2 = Math.PI * lat2 / 180;
-    var radlon1 = Math.PI * lon1 / 180;
-    var radlon2 = Math.PI * lon2 / 180;
-    var theta = lon1 - lon2;
-    var radtheta = Math.PI * theta / 180;
-    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-    dist = Math.acos(dist);
-    dist = dist * 180 / Math.PI;
-    dist = dist * 60 * 1.1515;
-
-    if (unit == 'K') {
-        dist = dist * 1.609344;
-    }
-
-    if (unit == 'N') {
-        dist = dist * 0.8684;
-    }
-    return dist;
-}
-
 function success_factor(list_of_businesses) {
     var avg_checkin = 0;
     var avg_stars = 0;
     var avg_review_count = 0;
     var success_score = [];
     var no_of_businesses = list_of_businesses.length;
-    var max_checkin = 0,
+    var max_checkins = 0,
         max_stars = 0,
-        max_review_count = 0;
+        max_review_counts = 0;
+
     //calculating the mean of checkin, stars and review count of a business category
     for (var i = 0; i < list_of_businesses.length; i++) {
         avg_checkin += parseFloat(list_of_businesses[i].total_checkin);
@@ -41,39 +20,36 @@ function success_factor(list_of_businesses) {
     avg_checkin /= no_of_businesses;
     avg_stars /= no_of_businesses;
     avg_review_count /= no_of_businesses;
-    //Normalizing the values
-    for (var k = 0; k < list_of_businesses.length; k++) {
 
-        if (parseFloat(list_of_businesses[k].total_checkin) > parseFloat(max_checkin)) {
-            max_checkin = parseFloat(list_of_businesses[k].total_checkin);
+    //Normalizing the values
+    for (i = 0; i < list_of_businesses.length; i++) {
+        if (parseFloat(list_of_businesses[i].total_checkin) > parseFloat(max_checkins)) {
+            max_checkins = parseFloat(list_of_businesses[i].total_checkin);
         }
         if (parseFloat(list_of_businesses[k].stars) > parseFloat(max_stars)) {
             max_stars = parseFloat(list_of_businesses[k].stars);
         }
-        if (parseFloat(list_of_businesses[k].review_count) > max_review_count) {
-            max_review_count = parseFloat(list_of_businesses[k].review_count);
+        if (parseFloat(list_of_businesses[k].review_count) > max_review_counts) {
+            max_review_counts = parseFloat(list_of_businesses[k].review_count);
         }
     }
-    console.log("Max checkin, stars and review count is " + max_checkin + " , " + max_stars + " , " + max_review_count);
 
+    console.log("Max checkin, stars and review count is " + max_checkins + " , " + max_stars + " , " + max_review_counts);
     console.log("Average Checkin :" + avg_checkin + " Avg Stars :" + avg_stars + "Average review count " + avg_review_count);
-    for (var j = 0; j < list_of_businesses.length; j++) {
+
+    for (i = 0; j < list_of_businesses.length; i++) {
         success_score.push({
-            'business_id': list_of_businesses[j].business_id,
-            'business_name': list_of_businesses[j].business_name,
-            'total_checkin': list_of_businesses[j].total_checkin,
-            'stars': list_of_businesses[j].stars,
-            'review_count': list_of_businesses[j].review_count,
-            'latitude': list_of_businesses[j].latitude,
-            'longitude': list_of_businesses[j].longitude,
-            'score': ((parseFloat(list_of_businesses[j].total_checkin / max_checkin) + parseFloat(list_of_businesses[j].stars / max_stars) + parseFloat(list_of_businesses[j].review_count / max_review_count)) / 3)
+            'business_id': list_of_businesses[i].business_id,
+            'business_name': list_of_businesses[i].business_name,
+            'total_checkin': list_of_businesses[i].total_checkin,
+            'stars': list_of_businesses[i].stars,
+            'review_count': list_of_businesses[i].review_count,
+            'latitude': list_of_businesses[i].latitude,
+            'longitude': list_of_businesses[i].longitude,
+            'score': ((parseFloat(list_of_businesses[i].total_checkin / max_checkins) + parseFloat(list_of_businesses[i].stars / max_stars) + parseFloat(list_of_businesses[i].review_count / max_review_counts)) / 3)
         });
     }
     return success_score;
-}
-function retTransport(transport) {
-    var transport_list = transport;
-    return transport_list;
 }
 
 function getTransports(city, callback) {
@@ -81,7 +57,6 @@ function getTransports(city, callback) {
     callback(JSON.parse(transports));
 }
 function getMuseums(city, callback) {
-    console.log("I'm here");
     var museums = fs.readFileSync(utils.path('edinburgh_attractions'), 'utf8'); // Reading the file yelp_academic_dataset_edinburgh_museum.json as a JSON file.
     callback(JSON.parse(museums));
 }
@@ -90,31 +65,28 @@ function getLiquor(city, callback) {
     callback(JSON.parse(liquors));
 }
 
-
 function cal_success_business(city, business, callback) {
     console.log("Hello before");
     utils.askDrill("select business_id, name, total_checkin, stars, review_count, latitude, longitude from " + utils.datasetPath('edinburgh_info') + " where category='" + business + "'", function(answer) {
         var list_of_businesses = [];
-        for (
-        var row of answer.rows) {
-        list_of_businesses.push({
-            'business_id': row.business_id,
-            'business_name': row.name,
-            'total_checkin': row.total_checkin,
-            'stars': row.stars,
-            'review_count': row.review_count,
-            'latitude': row.latitude,
-            'longitude': row.longitude
-        });
+        for (var i = 0; i < answer.rows.length; i++) {
+            list_of_businesses.push({
+                'business_id': answer.rows[i].business_id,
+                'business_name': answer.rows[i].name,
+                'total_checkin': answer.rows[i].total_checkin,
+                'stars': answer.rows[i].stars,
+                'review_count': answer.rows[i].review_count,
+                'latitude': answer.rows[i].latitude,
+                'longitude': answer.rows[i].longitude
+            });
         }
         callback(success_factor(list_of_businesses));
     });
 }
 
 function squareInCircle(cx, cy, radius) {
-
-    var side = Math.sqrt(radius * radius * 2), // calc side length of square
-        half = side * 0.5; // position offset
+    var side = Math.sqrt(radius * radius * 2); // calc side length of square
+    var half = side * 0.5; // position offset
     polygon = [
         [cx - half],
         [cy - half],
@@ -122,6 +94,61 @@ function squareInCircle(cx, cy, radius) {
         [side]
     ];
     return polygon;
+}
+
+function getNearestElement(business, list) {
+    var nearestElement = {};
+    var distanceToElement;
+    var tempNearestElement;
+    if (list.length > 0) {
+        tempNearestElement = utils.distance(list[0].lat, list[0].lon, business.latitude, business.longitude);
+    } else {
+        return {};
+    }
+    for (var i = 0; i < list.length; i++) {
+        distanceToElement = utils.distance(transports[j].lat, transports[j].lon, business.latitude, business.longitude);
+        if (distanceToElement <= tempNearestElement) {
+            tempNearestElement = distances;
+            nearestElement = list[i];
+        }
+    }
+    return nearestElement;
+}
+
+function getNearestElements(business, transports, museums, liquors) {
+    // Nearest transport
+    var unformattedNearestTransport = getNearestElement(business, transports);
+    var nearestTransport = {
+        latitude: unformattedNearestTransport.lat,
+        longitude: unformattedNearestTransport.lon,
+        t_type: unformattedNearestTransport.railway
+    };
+
+    // Nearest museum
+    var unformattedNearestMuseum = getNearestElement(business, museums);
+    var nearestMuseum = {
+        latitude: unformattedNearestMuseum.lat,
+        longitude: unformattedNearestMuseum.lon,
+        t_type: "Museum",
+        m_dist: utils.distance(unformattedNearestMuseum.lat, unformattedNearestMuseum.lon, business.latitude, business.longitude)
+    };
+
+    // Nearest liquor store
+    var unformattedNearestLiquorStore = getNearestElement(business, liquors);
+    var nearestLiquorStore = {
+        latitude: unformattedNearestLiquorStore.lat,
+        longitude: unformattedNearestLiquorStore.lon,
+        t_type: "Liquor Shop",
+        m_dist: utils.distance(unformattedNearestLiquorStore.lat, unformattedNearestLiquorStore.lon, business.latitude, business.longitude)
+    };
+
+    return {
+        business: business,
+        transport_list: nearestTransport,
+        distance: utils.distance(nearestTransport.lat, nearestTransport.lon, business.latitude, business.longitude),
+        museum: nearestMuseum,
+        liquor: nearestLiquorStore
+    };
 }
 
 
@@ -132,7 +159,7 @@ module.exports = {
                 error: 'Parameter business is undefined'
             });
         } else {
-            cal_success_business(parameters.city, parameters.business, function(list_of_businesses) {
+            cal_success_business(parameters.city, parameters.business, function(businesses) {
                 getTransports(parameters.city, function(transports) {
                     getMuseums(parameters.city, function(museums) {
                         getLiquor(parameters.city, function(liquors) {
@@ -140,110 +167,31 @@ module.exports = {
                                 circles: [],
                                 markers: []
                             };
-                            var temp = transports[0];
-                            var temp_nearest_transport = 0;
-                            var transport_coordinates = [];
-                            console.log("temp is " + temp.railway);
-                            var final_list = [];
-                            for (var j = 0; j < list_of_businesses.length; j++) {
-                                for (var i = 0; i < transports.length; i++) {
-                                    var distances = distance(transports[i].lat, transports[i].lon, list_of_businesses[j].latitude, list_of_businesses[j].longitude, 'K');
-                                    if (i === 0) {
-                                        temp_nearest_transport = distances;
-                                    }
-                                    if (distances < temp_nearest_transport) {
-                                        temp_nearest_transport = distances;
-                                        transport_coordinates = [];
-                                        transport_coordinates.push({
-                                            latitude: transports[i].lat,
-                                            longitude: transports[i].lon,
-                                            t_type: transports[i].railway
-                                        });
-                                    }
-                                }
-                                final_list.push({
-                                    business: list_of_businesses[j],
-                                    transport_list: transport_coordinates[0],
-                                    distance: temp_nearest_transport,
-                                    museum: {},
-                                    liquor: {}
-                                });
-                            }
-                            //Adding Museums or attractions
-                            var museums_list = museums;
-                            var museum_coordinates = [];
-                            var temp_nearest_museum = 0;
-                            for (var u = 0; u < list_of_businesses.length; u++) {
-                                for (var v = 0; v < museums_list.length; v++) {
-                                    var museum_distances = distance(museums_list[v].lat, museums_list[v].lon, list_of_businesses[u].latitude, list_of_businesses[u].longitude, 'K');
-                                    if (v === 0) {
-                                        temp_nearest_museum = museum_distances;
-                                    }
-                                    if (museum_distances < temp_nearest_museum) {
-                                        temp_nearest_museum = museum_distances;
-                                        museum_coordinates = [];
-                                        museum_coordinates.push({
-                                            latitude: museums_list[v].lat,
-                                            longitude: museums_list[v].lon,
-                                            t_type: "Museum",
-                                            m_dist: temp_nearest_museum
-                                        });
-                                    }
-                                }
-                                final_list[u].museum = museum_coordinates[0];
-                            }
-                            //Adding Liquor stores
-                            var liquor_list = liquors;
-                            var liquor_coordinates = [];
-                            var temp_nearest_liquor = 0;
-                            for (var w = 0; w < list_of_businesses.length; w++) {
-                                for (var x = 0; x < liquor_list.length; x++) {
-                                    var liquor_distances = distance(liquor_list[x].lat, liquor_list[x].lon, list_of_businesses[w].latitude, list_of_businesses[w].longitude, 'K');
-                                    if (x === 0) {
-                                        temp_nearest_liquor = liquor_distances;
-                                    }
-                                    if (liquor_distances < temp_nearest_liquor) {
-                                        temp_nearest_liquor = liquor_distances;
-                                        liquor_coordinates = [];
-                                        liquor_coordinates.push({
-                                            latitude: liquor_list[x].lat,
-                                            longitude: liquor_list[x].lon,
-                                            t_type: "Liquor Shop",
-                                            l_dist: temp_nearest_liquor
-                                        });
-                                    }
-                                }
-                                final_list[w].liquor = liquor_coordinates[0];
-                            }
-                            //Museum and Business List on console
-                            console.log("Business_Stars, Business_Review_Count, Business_total_checkin, Business _Success_score, Transport distance, Attraction _distance, liquor_distances");
-                            for (
-                            var m_list of final_list) {
-                            console.log(m_list.business.stars + ", " + m_list.business.review_count + ", " + m_list.business.total_checkin + ", " + (parseFloat(m_list.business.score * 1000).toFixed(2)) + ", " + (parseFloat(m_list.distance * 1000).toFixed(2)) + ", " + (parseFloat(m_list.museum.m_dist * 1000).toFixed(2)) + ", " + (parseFloat(m_list.liquor.l_dist * 1000).toFixed(2)));
+
+                            var list = [];
+                            for (var i = 0; i < businesses.length; i++) {
+                                list.push(getNearestElements(businesses[i], transports, museums, liquors));
                             }
 
-
-                            for (var m = 0; m < final_list.length; m++) {
+                            for (i = 0; m < list.length; m++) {
                                 //squareInCircle(final_list[m].business.latitude, final_list[m].business.longitude, 200);
                                 answer.circles.push({
-                                    latitude: final_list[m].business.latitude,
-                                    longitude: final_list[m].business.longitude,
+                                    latitude: list[m].business.latitude,
+                                    longitude: list[m].business.longitude,
                                     radius: 150,
-                                    popup: final_list[m].business.business_name + " \n , Success score: " + parseFloat(final_list[m].business.score).toFixed(2) + " \n " + final_list[m].transport_list.t_type + " : " + parseFloat(final_list[m].distance * 1000).toFixed(2) + " meters away, \n Attraction :  " + parseFloat(final_list[m].museum.m_dist * 1000).toFixed(2) + " meters away, Liquor shop : " + parseFloat(final_list[m].liquor.l_dist * 1000).toFixed(2) + " meters away",
+                                    popup: list[m].business.business_name + " \n , Success score: " + parseFloat(list[m].business.score).toFixed(2) + " \n " + list[m].transport_list.t_type + " : " + parseFloat(list[m].distance * 1000).toFixed(2) + " meters away, \n Attraction :  " + parseFloat(list[m].museum.m_dist * 1000).toFixed(2) + " meters away, Liquor shop : " + parseFloat(list[m].liquor.l_dist * 1000).toFixed(2) + " meters away",
                                     options: {
                                         stroke: false,
-                                        fillColor: ((parseFloat(final_list[m].business.score) > 0.66 && parseFloat(final_list[m].business.score) <= 1) ? "#ffff00" : (parseFloat(final_list[m].business.score) > 0 && parseFloat(final_list[m].business.score) < 0.34) ? "#0000FF" : "#FF0000")
+                                        fillColor: ((parseFloat(list[m].business.score) > 0.66 && parseFloat(list[m].business.score) <= 1) ? "#ffff00" : (parseFloat(list[m].business.score) > 0 && parseFloat(list[m].business.score) < 0.34) ? "#0000FF" : "#FF0000")
                                     }
+                                });
+                                answer.markers.push({
+                                    latitude: list[n].transport_list.latitude,
+                                    longitude: list[n].transport_list.longitude,
+                                    popup: list[n].transport_list.t_type
                                 });
                             }
 
-                            for (var n = 0; n < final_list.length; n++) {
-                                answer.markers.push({
-                                    latitude: final_list[n].transport_list.latitude,
-                                    longitude: final_list[n].transport_list.longitude,
-                                    popup: final_list[n].transport_list.t_type
-                                });
-                            }
                             callback(answer);
                         });
                     });
@@ -252,45 +200,44 @@ module.exports = {
         }
     },
     test: function() {
-        cal_success_business('Edinburgh', 'Fast Food', function(list_of_businesses) {
+        cal_success_business('Edinburgh', 'Fast Food', function(businesses) {
             getTransports('Edingurgh', function(transports) {
-                var temp = transports[0];
+                var i, j;
                 var temp_nearest_transport = 0;
                 var transport_coordinates = [];
-                console.log("temp is " + temp.railway);
                 var final_list = [];
-                for (var j = 0; j < list_of_businesses.length; j++) {
+                for (i = 0; i < businesses.length; i++) {
                     if (transports.railway === 'bus_stop') {
-                        for (var i = 0; i < transports.length; i++) {
-                            var distances = distance(transports[i].lat, transports[i].lon, list_of_businesses[j].latitude, list_of_businesses[j].longitude, 'K');
-                            if (i === 0) {
-                                temp_nearest_transport = distances; //console.log("Distance is " + temp_nearest_transport);
+                        for (j = 0; j < transports.length; j++) {
+                            var distances = utils.distance(transports[j].lat, transports[j].lon, businesses[i].latitude, businesses[i].longitude);
+                            if (j === 0) {
+                                temp_nearest_transport = distances;
                             }
                             if (distances < temp_nearest_transport) {
                                 temp_nearest_transport = distances;
                                 transport_coordinates = [];
                                 transport_coordinates.push({
-                                    latitude: transports[i].lat,
-                                    longitude: transports[i].lon,
-                                    t_type: transports[i].railway
+                                    latitude: transports[j].lat,
+                                    longitude: transports[j].lon,
+                                    t_type: transports[j].railway
                                 });
                                 console.log("Inside if Distance from " + transport_coordinates[0].latitude);
                             }
                         }
                     }
                     final_list.push({
-                        business: list_of_businesses[j],
+                        business: businesses[i],
                         transport: transport_coordinates,
                         distance: temp_nearest_transport
                     });
                 }
 
-                for (var l = 0; l < final_list.length; l++) {
-                    console.log("Hello " + final_list[l].transport[0].latitude);
+                for (i = 0; i < final_list.length; i++) {
+                    console.log("Hello " + final_list[i].transport[0].latitude);
                 }
                 console.log("Length is " + list_of_businesses.length);
-                for (var k = 0; k < list_of_businesses.length; k++) {
-                    console.log(list_of_businesses[k].business_id + " , " + list_of_businesses[k].business_name + " Score of the business: " + list_of_businesses[k].score);
+                for (i = 0; i < list_of_businesses.length; i++) {
+                    console.log(list_of_businesses[i].business_id + " , " + list_of_businesses[i].business_name + " Score of the business: " + list_of_businesses[i].score);
                 }
 
             });
