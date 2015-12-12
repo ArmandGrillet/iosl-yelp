@@ -2,11 +2,12 @@
     "name": "overpass-parser",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "parser.js",
     "dependencies": {
         "async": "latest",
         "fs": "latest",
-        "path": "latest"
+        "path": "latest",
+        "json2csv": "latest"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
