@@ -9,7 +9,7 @@ function getBusinessesWithCategoryInCity(city, category, callback) {
 
 module.exports = {
     get: function(parameters, callback) {
-        if (parameters.category === undefined) { // We only need to test name as city is a mandatory attribute {
+        if (parameters.category === undefined) { // We only need to test the category as city is a mandatory attribute {
             callback({
                 error: 'Parameter category is undefined'
             });

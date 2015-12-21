@@ -6,12 +6,38 @@ var async = require('async');
 var fs = require('fs');
 var path = require('path');
 
+function getCenter(nodes, list) {
+    var nodesCoordinates = [];
+    for (var i = 0; i < nodes.length; i++) {
+        for (var j = 0; j < list.length; j++) {
+            if (list[j].id === nodes[i]) {
+                nodesCoordinates.push({
+                    lat: list[j].lat,
+                    lon: list[j].lon
+                });
+            }
+        }
+    }
+    var center = {
+        lat: nodesCoordinates[0].lat,
+        lon: nodesCoordinates[0].lon
+    };
+
+    for (i = 1; i < nodesCoordinates.length; i++) {
+        center.lat = (center.lat * i + nodesCoordinates[i].lat) / (i + 1);
+        center.lon = (center.lon * i + nodesCoordinates[i].lon) / (i + 1);
+    }
+
+    return center;
+}
+
 var obj;
-var dir = '/Users/Armand/Google Drive/Master/Year 2/Semester 3/IoSL/Documents/Algorithm/Features/Edinburgh/';
+var dir = '/Users/Armand/Google Drive/Master/Year 2/Semester 3/IoSL/Documents/Algorithm/Features/Sources/Edinburgh/';
 
 var goodJSON = {
     types: []
 };
+var center;
 
 fs.readdir(dir, function(err, files) {
     if (err)
@@ -32,11 +58,16 @@ fs.readdir(dir, function(err, files) {
                         goodJSON.types.push(name);
                         goodJSON[name] = [];
                     }
-                    if (obj.elements[i].type == 'node') {
-                        goodJSON[name].push({
-                            lat: obj.elements[i].lat,
-                            lon: obj.elements[i].lon
-                        });
+                    if (obj.elements[i].tags !== undefined) { // A real feature
+                        if (obj.elements[i].type == 'node') { // Simple coordinates
+                            goodJSON[name].push({
+                                lat: obj.elements[i].lat,
+                                lon: obj.elements[i].lon
+                            });
+                        } else if (obj.elements[i].nodes !== undefined) {
+                            console.log(obj.elements[i]);
+                            goodJSON[name].push(getCenter(obj.elements[i].nodes, obj.elements)); // Multiple coordinates, we need to compute the center
+                        }
                     }
                 }
                 callback();
