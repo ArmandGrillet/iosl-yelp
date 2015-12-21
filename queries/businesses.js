@@ -23,12 +23,9 @@ module.exports = {
                         latitude: businesses[i].latitude,
                         longitude: businesses[i].longitude,
                         options: {
-                            alt: businesses[i].business_id
-                        },
-                        onclick: {
-                            business_id: businesses[i].business_id
+                            alt: businesses[i].business_id,
+                            onclick: true
                         }
-
                     });
                 }
                 callback(answer);

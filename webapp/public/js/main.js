@@ -42,7 +42,6 @@ var cities = {
         longitude: -3.188267
     },
 };
-
 window.onload = function() {
     map = L.map('map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15);
     markersLayer = new L.LayerGroup().addTo(map);
@@ -96,7 +95,7 @@ function display(data) {
         console.log(data.error);
     } else {
         markersLayer.clearLayers(); // We clean the map
-        var position, popup, onclick; // Position and popup of an element.
+        var position, popup; // Position and popup of an element.
         var i; // Loop to go through the elements.
         if (data.position !== undefined) {
             console.log(data.position);
@@ -107,9 +106,9 @@ function display(data) {
         }
         if (data.markers !== undefined) {
             var markers = data.markers;
-            var marker;
             for (i = 0; i < markers.length; i++) {
                 var markerParameters = markers[i];
+
                 position = {
                     latitude: markerParameters.latitude,
                     longitude: markerParameters.longitude
@@ -119,14 +118,19 @@ function display(data) {
 
                 marker = L.marker([position.latitude, position.longitude], markerParameters.options);
                 if (markerParameters.popup !== undefined) {
-                    popup = markerParameters.popup;
-                    delete markerParameters.popup;
-                    marker.bindPopup(popup);
+                    console.log("On a une popup");
+                    marker.bindPopup(markerParameters.popup);
                 }
-                if (markerParameters.onclick !== undefined) {
-                    onclick = markerParameters.onclick;
-                    delete markerParameters.onclick;
+                if (markerParameters.options.onclick === true) {
                     marker.on('click', markerClick);
+                }
+                if (markerParameters.options.icon !== undefined) {
+                    marker.setIcon(L.icon({
+                        iconUrl: '../markers/' + markerParameters.options.icon + '.png',
+                        iconRetinaUrl: '../markers/' + markerParameters.options.icon + '@2x.png',
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    }));
                 }
                 marker.addTo(markersLayer);
             }
