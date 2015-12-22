@@ -32,7 +32,7 @@ function getCenter(nodes, list) {
 }
 
 var obj;
-var dir = '/Users/Armand/Google Drive/Master/Year 2/Semester 3/IoSL/Documents/Algorithm/Features/Sources/Edinburgh/';
+var dir = '/Users/Armand/Google Drive/Master/Year 2/Semester 3/IoSL/Documents/Algorithm/Features/Sources/Edinburgh/'; // Directory with all the JSON files for a city.
 
 var goodJSON = {
     types: []
@@ -54,19 +54,36 @@ fs.readdir(dir, function(err, files) {
                 obj = JSON.parse(data);
                 for (var i = 0; i < obj.elements.length; i++) {
                     if (i === 0) {
-                        console.log("On push le name");
                         goodJSON.types.push(name);
                         goodJSON[name] = [];
                     }
+
+                    if (name === 'zoo') {
+                        console.log(obj.elements[i].type);
+                        if (obj.elements[i].type === 'way') {
+                            console.log(obj.elements[i].nodes);
+                        }
+                    }
+
                     if (obj.elements[i].tags !== undefined) { // A real feature
                         if (obj.elements[i].type == 'node') { // Simple coordinates
                             goodJSON[name].push({
                                 lat: obj.elements[i].lat,
                                 lon: obj.elements[i].lon
                             });
-                        } else if (obj.elements[i].nodes !== undefined) {
-                            console.log(obj.elements[i]);
+                        } else if (obj.elements[i].type === 'way') {
+                            if (name === 'zoo') {
+                                console.log(obj.elements[i]);
+                            }
                             goodJSON[name].push(getCenter(obj.elements[i].nodes, obj.elements)); // Multiple coordinates, we need to compute the center
+                        } else if (obj.elements[i].type === 'relation') {
+                            for (var j = 0; j < obj.elements[i].members.length; j++) { // Add tags to the main elements of the relation so that we'll add them later.
+                                for (var k = 0; k < obj.elements.length; k++) {
+                                    if (obj.elements[k].id === obj.elements[i].members[j].ref) {
+                                        obj.elements[k].tags = obj.elements[i].tags;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -77,10 +94,8 @@ fs.readdir(dir, function(err, files) {
         }
     }, function(err) {
         if (err) {
-            console.log('A file failed to process');
+            console.log('A file failed to process.');
         } else {
-            console.log("Everything worked");
-            console.log(goodJSON.types);
             fs.writeFile("./edinburgh.json", JSON.stringify(goodJSON), function(err) {
                 if (err) {
                     return console.log(err);
