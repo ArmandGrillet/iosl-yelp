@@ -115,6 +115,9 @@ module.exports = {
             }
         );
     },
+    capitalizeFirstLetter: function(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    },
     datasetPath: function(dataset) {
         return 'dfs.`' + path.normalize(__dirname + '/../../yelp_dataset_challenge_academic_dataset/') + 'yelp_academic_dataset_' + dataset + '.json`';
     },

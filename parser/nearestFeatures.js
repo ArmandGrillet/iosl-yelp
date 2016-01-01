@@ -4,7 +4,6 @@
 var fs = require('fs');
 var json2csv = require('json2csv');
 var utils = require('../queries/utils');
-var source = require("../../features/edinburgh.json");
 
 function checkinfsForId(id, data) {
     for (var i = 0; i < data.rows.length; i++) {
@@ -40,14 +39,23 @@ function getBusinesses(city, category, callback) {
     });
 }
 
-function getNumberOfFeaturesforRadius(business, radius, list) {
-    var elementsInRadius = 0;
+function getDistanceToNearestElement(business, list) {
+    var nearestElement = {};
+    var distanceToElement;
+    var nearestDistance;
+    if (list.length > 0) {
+        nearestDistance = utils.distance(list[0].lat, list[0].lon, business.latitude, business.longitude);
+    } else {
+        return {};
+    }
     for (var i = 0; i < list.length; i++) {
-        if (utils.distance(list[i].lat, list[i].lon, business.latitude, business.longitude) <= radius) {
-            elementsInRadius++;
+        distanceToElement = utils.distance(list[i].lat, list[i].lon, business.latitude, business.longitude);
+        if (distanceToElement <= nearestDistance) {
+            nearestDistance = distanceToElement;
+            nearestElement = list[i];
         }
     }
-    return elementsInRadius;
+    return nearestDistance;
 }
 
 function addSuccess(businesses) {
@@ -93,32 +101,69 @@ function addSuccess(businesses) {
     return businessesWithSuccess;
 }
 
-getBusinesses('Edinburgh', 'Bars', function(businesses) {
-    var fields = ['name', 'success'].concat(source.types);
-    var rows = [];
+var featuresPath;
+var city;
+var category;
+var outputFile;
 
-    var row;
-    var type;
-    for (var i = 0; i < businesses.length; i++) {
-        row = {
-            "name": businesses[i].name,
-            "success": businesses[i].success
-        };
-        for (var j = 2; j < fields.length; j++) {
-            row[fields[j]] = getNumberOfFeaturesforRadius(businesses[i], 350, source[fields[j]]);
-        }
-        rows.push(row);
+// Processing the parameters.
+process.argv.forEach(function(val, index, array) {
+    switch (index) {
+        case 2:
+            featuresPath = val;
+            break;
+        case 3:
+            city = utils.capitalizeFirstLetter(val);
+            break;
+        case 4:
+            category = utils.capitalizeFirstLetter(val);
+            break;
+        case 5:
+            outputFile = val;
+            break;
+        default:
+            break;
     }
+});
 
-    json2csv({
-        data: rows,
-        fields: fields
-    }, function(err, csv) {
-        if (err) console.log(err);
-        fs.writeFile('Bars.csv', csv, function(err) {
-            if (err)
-                throw err;
-            console.log('file saved');
+if (featuresPath === undefined || city === undefined || category === undefined || outputFile === undefined) {
+    console.log("Usage: node nearestFeatures FEATURESPATH CITY BUSINESS OUTPUTFILE. E.g. 'node extractor path/to/city.json City Bars cityBars' will create a cityBars.csv file");
+} else {
+    fs.readFile(featuresPath, 'utf8', function(err, data) {
+        if (err) {
+            return console.log(err);
+        }
+        var source = JSON.parse(data); // Parsing the JSON features
+        getBusinesses(city, category, function(businesses) {
+            var fields = ['name', 'success'].concat(source.types);
+            var rows = [];
+
+            var row;
+            var type;
+            for (var i = 0; i < businesses.length; i++) {
+                row = {
+                    "name": businesses[i].name,
+                    "success": businesses[i].success
+                };
+                for (var j = 2; j < fields.length; j++) {
+                    row[fields[j]] = Math.round(getDistanceToNearestElement(businesses[i], source[fields[j]]) * 1000);
+                }
+                rows.push(row);
+            }
+
+            json2csv({
+                data: rows,
+                fields: fields
+            }, function(err, csv) {
+                if (err) {
+                    console.log(err);
+                }
+                fs.writeFile("./" + outputFile + '.csv', csv, function(err) {
+                    if (err)
+                        throw err;
+                    console.log(outputFile + ' saved.');
+                });
+            });
         });
     });
-});
+}
