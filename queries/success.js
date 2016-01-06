@@ -65,8 +65,7 @@ function getLiquor(city, callback) {
     callback(JSON.parse(liquors));
 }
 
-function cal_success_business(city, business, callback) {
-    console.log("Hello before");
+function getSuccess(city, business, callback) {
     utils.askDrill("select business_id, name, total_checkin, stars, review_count, latitude, longitude from " + utils.datasetPath('edinburgh_info') + " where category='" + business + "'", function(answer) {
         var list_of_businesses = [];
         for (var i = 0; i < answer.rows.length; i++) {
@@ -159,7 +158,7 @@ module.exports = {
                 error: 'Parameter business is undefined'
             });
         } else {
-            cal_success_business(parameters.city, parameters.business, function(businesses) {
+            getSuccess(parameters.city, parameters.business, function(businesses) {
                 getTransports(parameters.city, function(transports) {
                     getMuseums(parameters.city, function(museums) {
                         getLiquor(parameters.city, function(liquors) {
@@ -200,7 +199,7 @@ module.exports = {
         }
     },
     test: function() {
-        cal_success_business('Edinburgh', 'Fast Food', function(businesses) {
+        getSuccess('Edinburgh', 'Fast Food', function(businesses) {
             getTransports('Edingurgh', function(transports) {
                 var i, j;
                 var temp_nearest_transport = 0;

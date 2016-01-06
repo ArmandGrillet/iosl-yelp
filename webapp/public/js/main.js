@@ -109,7 +109,6 @@ function display(data) {
             var markers = data.markers;
             for (i = 0; i < markers.length; i++) {
                 var markerParameters = markers[i];
-                console.log(markerParameters);
 
                 position = {
                     latitude: markerParameters.latitude,
@@ -123,16 +122,18 @@ function display(data) {
                     console.log("On a une popup");
                     marker.bindPopup(markerParameters.popup);
                 }
-                if (markerParameters.options.onclick === true) {
-                    marker.on('click', markerClick);
-                }
-                if (markerParameters.options.icon !== undefined) {
-                    marker.setIcon(L.icon({
-                        iconUrl: '../markers/' + markerParameters.options.icon + '.png',
-                        iconRetinaUrl: '../markers/' + markerParameters.options.icon + '@2x.png',
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    }));
+                if (markerParameters.options !== undefined) {
+                    if (markerParameters.options.onclick === true) {
+                        marker.on('click', markerClick);
+                    }
+                    if (markerParameters.options.icon !== undefined) {
+                        marker.setIcon(L.icon({
+                            iconUrl: '../markers/' + markerParameters.options.icon + '.png',
+                            iconRetinaUrl: '../markers/' + markerParameters.options.icon + '@2x.png',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        }));
+                    }
                 }
                 marker.addTo(markersLayer);
             }

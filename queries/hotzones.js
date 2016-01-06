@@ -64,7 +64,7 @@ module.exports = {
                                     longitude: grid.features[i].geometry.coordinates[3][1]
                                 }
                             ],
-                            popup: grid.features[i].properties.business_ids.length.toString(),
+                            popup: ratioCheckins[i].toString(),
                             options: {
                                 stroke: false,
                                 fill: true,
