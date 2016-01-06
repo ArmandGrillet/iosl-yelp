@@ -15,17 +15,23 @@ module.exports = {
             });
         } else {
             getBusinessesWithNameInCity(parameters.city, parameters.business, function(businesses) {
-                var answer = {
-                    markers: []
-                };
-                for (var i = 0; i < businesses.length; i++) {
-                    answer.markers.push({
-                        latitude: businesses[i].latitude,
-                        longitude: businesses[i].longitude,
-                        popup: businesses[i].name
+                if (businesses[0].name === undefined) { // The first business is {} thus there is no business returned.
+                    callback({
+                        error: 'No businesses with that name'
                     });
+                } else {
+                    var answer = {
+                        markers: []
+                    };
+                    for (var i = 0; i < businesses.length; i++) {
+                        answer.markers.push({
+                            latitude: businesses[i].latitude,
+                            longitude: businesses[i].longitude,
+                            popup: businesses[i].name
+                        });
+                    }
+                    callback(answer);
                 }
-                callback(answer);
             });
         }
     },

@@ -1,5 +1,5 @@
 var utils = require('./utils');
-var edinburgh = require("../../features/edinburgh.json");
+var edinburgh = require("../static/features/edinburgh.json");
 // We need to require all the cities.
 
 module.exports = {

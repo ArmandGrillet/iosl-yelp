@@ -1,28 +1,5 @@
 var utils = require('./utils');
 
-// Write the inner functions here.
-function distance(lat1, lon1, lat2, lon2, unit) { //function to calculate the distance between two coordinates
-    var radlat1 = Math.PI * lat1 / 180;
-    var radlat2 = Math.PI * lat2 / 180;
-    var radlon1 = Math.PI * lon1 / 180;
-    var radlon2 = Math.PI * lon2 / 180;
-    var theta = lon1 - lon2;
-    var radtheta = Math.PI * theta / 180;
-    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-    dist = Math.acos(dist);
-    dist = dist * 180 / Math.PI;
-    dist = dist * 60 * 1.1515;
-
-    if (unit == 'K') {
-        dist = dist * 1.609344;
-    }
-
-    if (unit == 'N') {
-        dist = dist * 0.8684;
-    }
-    return dist;
-}
-
 function uniqueHotspots(hotspots) { //Function to make the array with unique values
     var uniqueStringHotspots = [];
     var uniqueHotspots = [];
@@ -51,7 +28,7 @@ function get_hotspots(longitude, latitude) {
     for (var i = 0; i < longitude.length; i++) { //loop to iterate through the list of latitudes and longitudes and calculate distance between them
         hotspot_count = 0;
         for (var j = 0; j < longitude.length; j++) {
-            relative_distance = distance(latitude[i], longitude[i], latitude[j], longitude[j], 'K'); // calculating distance in KMs between two points on map
+            relative_distance = utils.distance(latitude[i], longitude[i], latitude[j], longitude[j]); // calculating distance in KMs between two points on map
             if (relative_distance < 3 && relative_distance > 0) { //We have taken distance 1.5 KM if the shops are neighbouring
                 hotspot_count = hotspot_count + 1;
                 temp_hotspots.push({

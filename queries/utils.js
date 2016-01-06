@@ -95,7 +95,7 @@ function writeGrid(city, grid) {
             }
         }
     }
-    fs.writeFileSync('../queries/geojson/' + city + '.geojson', JSON.stringify(json));
+    fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
 }
 
 module.exports = {
@@ -135,7 +135,7 @@ module.exports = {
         return dist;
     },
     getGrid: function(city, callback) {
-        var grid = JSON.parse(fs.readFileSync('../queries/geojson/' + city + '.geojson', 'utf8'));
+        var grid = JSON.parse(fs.readFileSync('../static/grid/' + city + '.geojson', 'utf8'));
         return callback(grid);
     },
     getGridForCategory: function(city, category, callback) {

@@ -94,6 +94,7 @@ function display(data) {
     if (data.error !== undefined) {
         console.log(data.error);
     } else {
+        console.log(data);
         markersLayer.clearLayers(); // We clean the map
         var position, popup; // Position and popup of an element.
         var i; // Loop to go through the elements.
@@ -108,6 +109,7 @@ function display(data) {
             var markers = data.markers;
             for (i = 0; i < markers.length; i++) {
                 var markerParameters = markers[i];
+                console.log(markerParameters);
 
                 position = {
                     latitude: markerParameters.latitude,
@@ -215,7 +217,6 @@ function getNearestCity(latitude, longitude) {
 }
 
 function markerClick(e) {
-    console.log(this);
     if (this.options.alt !== undefined) {
         var query = {};
         query.algorithm = 'info';
