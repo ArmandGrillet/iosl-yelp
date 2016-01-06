@@ -64,14 +64,7 @@ function addSuccess(businesses) {
     for (var i = 0; i < businesses.length; i++) {
         averageCheckins += parseFloat(businesses[i].checkins);
         averageStars += parseFloat(businesses[i].stars);
-        averageReviews += parseFloat(businesses[i].reviews);
-    }
-    averageCheckins /= businesses.length;
-    averageStars /= businesses.length;
-    averageReviews /= businesses.length;
 
-    // Normalizing the values
-    for (i = 0; i < businesses.length; i++) {
         if (parseFloat(businesses[i].checkins) > parseFloat(maxCheckins)) {
             maxCheckins = parseFloat(businesses[i].checkins);
         }
@@ -82,15 +75,31 @@ function addSuccess(businesses) {
             maxReviews = parseFloat(businesses[i].reviews);
         }
     }
+    averageCheckins /= businesses.length;
+    averageStars /= businesses.length;
+    averageReviews /= businesses.length;
 
+    var starsScore = {
+        0: 0.5,
+        1: 0.7,
+        2: 0.9,
+        3: 1,
+        4: 0.8,
+        5: 0.6
+    };
+
+    // Success = ponderation based on the stars * ((scorereviews + (scoreCheckins * 4)) / 5)
     for (i = 0; i < businesses.length; i++) {
+        console.log(starsScore[Math.round(businesses[i].stars)] * ((parseFloat(businesses[i].reviews / maxReviews) + parseFloat(businesses[i].checkins / maxCheckins) * 4) / 5));
         businessesWithSuccess.push({
             'name': businesses[i].name,
             'latitude': businesses[i].latitude,
             'longitude': businesses[i].longitude,
-            'success': ((parseFloat(businesses[i].checkins / maxCheckins) + parseFloat(businesses[i].stars / maxStars) + parseFloat(businesses[i].reviews / maxReviews)) / 3)
+            'success': starsScore[Math.round(businesses[i].stars)] * ((parseFloat(businesses[i].reviews / maxReviews) + parseFloat(businesses[i].checkins / maxCheckins) * 4) / 5)
         });
     }
+
+    // Putting the success between 0 and 1
     return businessesWithSuccess;
 }
 
@@ -124,7 +133,7 @@ process.argv.forEach(function(val, index, array) {
 });
 
 if (featuresPath === undefined || city === undefined || category === undefined || outputFile === undefined || isNaN(distance)) {
-    console.log("Usage: node nearestFeatures FEATURESPATH CITY BUSINESS OUTPUTFILE DISTANCE. E.g. 'node radiusFeatures path/to/city.json City Bars cityBars 100' will create a cityBars.csv file");
+    console.log("Usage: node newSuccess FEATURESPATH CITY BUSINESS OUTPUTFILE DISTANCE. E.g. 'node newSuccess path/to/city.json City Bars cityBars 100' will create a cityBars.csv file");
 } else {
     fs.readFile(featuresPath, 'utf8', function(err, data) {
         if (err) {
