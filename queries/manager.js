@@ -5,7 +5,7 @@ var businesses = require('./businesses');
 var example = require('./example');
 var grid_example = require('./grid_example');
 var features = require('./features');
-var finding_hotspot = require('./finding_hotspot');
+var hotspots = require('./hotspots');
 var hotzones = require('./hotzones');
 var info = require('./info');
 var success = require('./success');
@@ -22,8 +22,8 @@ module.exports = {
             case 'features':
                 features.get(parameters, callback);
                 break;
-            case 'finding_hotspot':
-                finding_hotspot.get(parameters, callback);
+            case 'hotspots':
+                hotspots.get(parameters, callback);
                 break;
             case 'grid_example':
                 grid_example.get(parameters, callback);
@@ -51,8 +51,8 @@ module.exports = {
             case 'example':
                 example.test(); // For the tests we don't use parameters, we directly modify the file containing the algorithm.
                 break;
-            case 'finding_hotspot':
-                finding_hotspot.test();
+            case 'hotspots':
+                hotspots.test();
                 break;
             case 'hotzones':
                 hotzones.test();

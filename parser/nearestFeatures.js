@@ -128,7 +128,6 @@ function addSuccess(businesses) {
     return businessesWithSuccess;
 }
 
-var featuresPath; // The path of the features.json file
 var city; // Name of the city where we have to proceed
 var category; // Category of businesses observed
 var outputFile; // Name of the ouput file (without file extension)
@@ -137,15 +136,12 @@ var outputFile; // Name of the ouput file (without file extension)
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            featuresPath = val;
-            break;
-        case 3:
             city = utils.capitalizeFirstLetter(val);
             break;
-        case 4:
+        case 3:
             category = utils.capitalizeFirstLetter(val);
             break;
-        case 5:
+        case 4:
             outputFile = val;
             break;
         default:
@@ -153,10 +149,10 @@ process.argv.forEach(function(val, index, array) {
     }
 });
 
-if (featuresPath === undefined || city === undefined || category === undefined || outputFile === undefined) { // One of the input is missing.
-    console.log("Usage: node nearestFeatures FEATURESPATH CITY BUSINESS OUTPUTFILE. E.g. 'node extractor path/to/city.json City Bars cityBars' will create a cityBars.csv file");
+if (city === undefined || category === undefined || outputFile === undefined) { // One of the input is missing.
+    console.log("Usage: node nearestFeatures FEATURESPATH CITY BUSINESS OUTPUTFILE. E.g. 'node nearestFeatures City Bars cityBars' will create a cityBars.csv file");
 } else {
-    fs.readFile(featuresPath, 'utf8', function(err, data) { // Getting all the features
+    fs.readFile(utils.featuresPath(city), 'utf8', function(err, data) { // Getting all the features
         if (err) {
             return console.log(err);
         }

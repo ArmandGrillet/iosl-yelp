@@ -134,6 +134,9 @@ module.exports = {
         dist = dist * 60 * 1.1515;
         return dist;
     },
+    featuresPath: function(city) {
+        return path.normalize(__dirname + '/../static/features/' + city + '.json');
+    },
     getGrid: function(city, callback) {
         var grid = JSON.parse(fs.readFileSync('../static/grid/' + city + '.geojson', 'utf8'));
         return callback(grid);

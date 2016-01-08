@@ -1,19 +1,15 @@
 var utils = require('./utils');
 
-function uniqueHotspots(hotspots) { //Function to make the array with unique values
+function getHostpots(hotspots) { //Function to make the array with unique values
     var uniqueStringHotspots = [];
     var uniqueHotspots = [];
-    for (
-    var hotspot of hotspots) {
-    if (uniqueStringHotspots.indexOf(JSON.stringify(hotspot)) == -1) {
-        uniqueStringHotspots.push(JSON.stringify(hotspot));
-        uniqueHotspots.push(hotspot);
+    for (var i = 0; i < hotspots.length; i++) {
+        if (uniqueStringHotspots.indexOf(JSON.stringify(hotspots[i])) == -1) {
+            uniqueStringHotspots.push(JSON.stringify(hotspots[i]));
+            uniqueHotspots.push(hotspots[i]);
+        }
     }
-    }
-    for (
-    var hotspot of uniqueHotspots){
-    console.log("Coordinates are " + hotspot.latitude + "and " + hotspot.longitude);
-    }
+
     return uniqueHotspots;
 }
 
@@ -30,7 +26,7 @@ function get_hotspots(longitude, latitude) {
         for (var j = 0; j < longitude.length; j++) {
             relative_distance = utils.distance(latitude[i], longitude[i], latitude[j], longitude[j]); // calculating distance in KMs between two points on map
             if (relative_distance < 3 && relative_distance > 0) { //We have taken distance 1.5 KM if the shops are neighbouring
-                hotspot_count = hotspot_count + 1;
+                hotspot_count++;
                 temp_hotspots.push({
                     'latitude': latitude[j],
                     'longitude': longitude[j]
@@ -48,16 +44,15 @@ function get_hotspots(longitude, latitude) {
             }
         }
         if (hotspot_count > hotspot_count_value) {
-            for(
-            var temp of temp_hotspots){
-            hotspots.push({
-                'latitude': temp.latitude,
-                'longitude': temp.longitude
-            });
-            hotspot_cluster_shop_list.push({ // Adding it to Cluster shop list
-                'latitude': temp.latitude,
-                'longitude': temp.longitude
-            });
+            for (j = 0; j < temp_hotspots.length; j++) {
+                hotspots.push({
+                    'latitude': temp_hotspots[j].latitude,
+                    'longitude': temp_hotspots[j].longitude
+                });
+                hotspot_cluster_shop_list.push({ // Adding it to Cluster shop list
+                    'latitude': temp_hotspots[j].latitude,
+                    'longitude': temp_hotspots[j].longitude
+                });
             }
         } else {
             hotspot_cluster_shop_list = [];
@@ -72,24 +67,24 @@ function get_hotspots(longitude, latitude) {
                 'latitude': latitude[i],
                 'longitude': longitude[i]
             });
-            hotspot_cluster_shop_list = uniqueHotspots(hotspot_cluster_shop_list);
+            hotspot_cluster_shop_list = getHostpots(hotspot_cluster_shop_list);
             console.log('Found a cluster with ' + hotspot_count + ' shops ' + hotspot_cluster_shop_list.length);
         }
         if (hotspot_count > hotspot_count_value) { //Here we are adding the all the shops in the cluster list and sending them to the function to get the mean of there cluster
             var temp_coordinates = [];
             temp_coordinates = meanHotspotPoint(hotspot_cluster_shop_list);
-            for(
-            var temp_points of temp_coordinates){
-            hotspot_cluster_mean_point_list.push({
-                'latitude': temp_points.latitude,
-                'longitude': temp_points.longitude
-            });}
+            for (j = 0; j < temp_coordinates.length; j++) {
+                hotspot_cluster_mean_point_list.push({
+                    'latitude': temp_coordinates[j].latitude,
+                    'longitude': temp_coordinates[j].longitude
+                });
+            }
             console.log("Cluster list is " + hotspot_cluster_mean_point_list.length);
         }
         hotspot_cluster_shop_list = [];
     }
-    return uniqueHotspots(meanHotspotsList(hotspot_cluster_mean_point_list)); // returning mean list of all clusters with unique value
-    //return uniqueHotspots(hotspots);
+    return getHostpots(meanHotspotsList(hotspot_cluster_mean_point_list)); // returning mean list of all clusters with unique value
+    //return getHostpots(hotspots);
 }
 
 function meanHotspotsList(hotspot_cluster_mean_point_list) {
@@ -101,11 +96,9 @@ function meanHotspotPoint(hotspot_cluster_shop_list) {
     var mean_longitude = 0;
     var mean_hotspot_point = [];
     var no_of_shops = hotspot_cluster_shop_list.length;
-    for(
-    var hotspot_sublist of hotspot_cluster_shop_list){
-    mean_latitude = parseFloat(mean_latitude) + parseFloat(hotspot_sublist.latitude);
-    mean_longitude = parseFloat(mean_longitude) + parseFloat(hotspot_sublist.longitude);
-    //console.log("Mean Latitude: " + mean_latitude);
+    for (var i = 0; i < hotspot_cluster_shop_list.length; i++) {
+        mean_latitude = parseFloat(mean_latitude) + parseFloat(hotspot_cluster_shop_list[i].latitude);
+        mean_longitude = parseFloat(mean_longitude) + parseFloat(hotspot_cluster_shop_list[i].longitude);
     }
     mean_latitude = mean_latitude / no_of_shops;
     mean_longitude = mean_longitude / no_of_shops;
@@ -114,23 +107,22 @@ function meanHotspotPoint(hotspot_cluster_shop_list) {
         'latitude': mean_latitude,
         'longitude': mean_longitude
     });
-    for(
-    var mean of mean_hotspot_point){
-    console.log("Mean List " + mean.latitude + " Mean longitude " + mean.longitude);
+
+    for (i = 0; i < mean_hotspot_point.length; i++) {
+        console.log("Mean List " + mean_hotspot_point[i].latitude + " Mean longitude " + mean_hotspot_point[i].longitude);
     }
     return mean_hotspot_point;
 }
 
 function list_of_shops_in_a_category(city, business, callback) {
     utils.askDrill("select categories[0] as Categories_of_Restaurant_in_Phoenix, latitude, longitude from " + utils.datasetPath('business') + " where city='" + city + "' and categories[0]='" + business + "'", function(answer) {
-        var longitude = new Array();
-        var latitude = new Array();
+        var longitude = [];
+        var latitude = [];
         var count = 0;
-        for (
-        var row of answer.rows) {
-        count++;
-        longitude[count] = row.longitude;
-        latitude[count] = row.latitude;
+        for (var i = 0; i < answer.rows.length; i++) {
+            count++;
+            longitude[count] = answer.rows[i].longitude;
+            latitude[count] = answer.rows[i].latitude;
         }
         callback(get_hotspots(longitude, latitude));
     });
@@ -138,12 +130,12 @@ function list_of_shops_in_a_category(city, business, callback) {
 
 module.exports = {
     get: function(parameters, callback) {
-        if (parameters.business === undefined) { // We only need to test name as city is a mandatory attribute {
+        if (parameters.category === undefined) { // We only need to test name as city is a mandatory attribute {
             callback({
-                error: 'Parameter business is undefined'
+                error: 'Parameter category is undefined'
             });
         } else {
-            list_of_shops_in_a_category(parameters.city, parameters.business, function(hotspot) {
+            list_of_shops_in_a_category(parameters.city, parameters.category, function(hotspot) {
                 var answer = {
                     circles: [],
                     markers: []
@@ -153,7 +145,7 @@ module.exports = {
                         latitude: hotspot[i].latitude,
                         longitude: hotspot[i].longitude,
                         radius: 500,
-                        popup: "Hostspot for " + parameters.business,
+                        popup: "Hostspot for " + parameters.category,
                         options: {
                             stroke: false,
                             fillColor: "#FF0000"

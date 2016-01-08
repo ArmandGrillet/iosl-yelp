@@ -92,7 +92,7 @@ function clearLayers() {
 
 function display(data) {
     if (data.error !== undefined) {
-        console.log(data.error);
+        alert(data.error);
     } else {
         console.log(data);
         markersLayer.clearLayers(); // We clean the map

@@ -1,7 +1,7 @@
 var utils = require('./utils');
 
-function getBusinessesWithNameInCity(city, business, callback) {
-    utils.askDrill("select name, latitude, longitude from " + utils.datasetPath('business') + " where city='" + city + "' and name = '" + business + "'", function(answer) {
+function getBusinessesWithNameInCity(city, name, callback) {
+    utils.askDrill("select name, latitude, longitude from " + utils.datasetPath('business') + " where city='" + city + "' and name = '" + name + "'", function(answer) {
         console.log(answer);
         callback(answer.rows);
     });
@@ -9,12 +9,12 @@ function getBusinessesWithNameInCity(city, business, callback) {
 
 module.exports = {
     get: function(parameters, callback) {
-        if (parameters.business === undefined) { // We only need to test name as city is a mandatory attribute {
+        if (parameters.name === undefined) { // We only need to test name as city is a mandatory attribute {
             callback({
-                error: 'Parameter business is undefined'
+                error: 'Parameter name is undefined'
             });
         } else {
-            getBusinessesWithNameInCity(parameters.city, parameters.business, function(businesses) {
+            getBusinessesWithNameInCity(parameters.city, parameters.name, function(businesses) {
                 if (businesses[0].name === undefined) { // The first business is {} thus there is no business returned.
                     callback({
                         error: 'No businesses with that name'
