@@ -94,7 +94,6 @@ function addSuccess(businesses) {
     return businessesWithSuccess;
 }
 
-var featuresPath;
 var city;
 var category;
 var outputFile;
@@ -104,18 +103,15 @@ var distance;
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            featuresPath = val;
-            break;
-        case 3:
             city = utils.capitalizeFirstLetter(val);
             break;
-        case 4:
+        case 3:
             category = utils.capitalizeFirstLetter(val);
             break;
-        case 5:
+        case 4:
             outputFile = val;
             break;
-        case 6:
+        case 5:
             distance = parseInt(val);
             break;
         default:
@@ -123,10 +119,10 @@ process.argv.forEach(function(val, index, array) {
     }
 });
 
-if (featuresPath === undefined || city === undefined || category === undefined || outputFile === undefined || isNaN(distance)) {
-    console.log("Usage: node nearestFeatures FEATURESPATH CITY BUSINESS OUTPUTFILE DISTANCE. E.g. 'node radiusFeatures path/to/city.json City Bars cityBars 100' will create a cityBars.csv file");
+if (city === undefined || category === undefined || outputFile === undefined || isNaN(distance)) {
+    console.log("Usage: node nearestFeatures CITY BUSINESS OUTPUTFILE DISTANCE. E.g. 'node radiusFeatures City Bars cityBars 100' will create a cityBars.csv file");
 } else {
-    fs.readFile(featuresPath, 'utf8', function(err, data) {
+    fs.readFile(utils.featuresPath(city), 'utf8', function(err, data) {
         if (err) {
             return console.log(err);
         }
