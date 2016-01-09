@@ -13,7 +13,8 @@
   "dependencies": {
     "path": "latest",
     "request": "latest",
-    "fs": "latest"
+    "fs": "latest",
+    "node-svm": "latest"
   },
   "author": "",
   "license": "ISC"
