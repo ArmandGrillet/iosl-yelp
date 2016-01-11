@@ -137,6 +137,19 @@ module.exports = {
     featuresPath: function(city) {
         return path.normalize(__dirname + '/../static/features/' + city + '.json');
     },
+    getCenterTile: function(coordinates) {
+        var center = {
+            latitude: coordinates[0][0],
+            longitude: coordinates[0][1]
+        };
+
+        for (var i = 1; i < coordinates.length; i++) {
+            center.latitude = (center.latitude * i + coordinates[i][0]) / (i + 1);
+            center.longitude = (center.longitude * i + coordinates[i][1]) / (i + 1);
+        }
+
+        return center;
+    },
     getGrid: function(city, callback) {
         var grid = JSON.parse(fs.readFileSync('../static/grid/' + city + '.geojson', 'utf8'));
         return callback(grid);

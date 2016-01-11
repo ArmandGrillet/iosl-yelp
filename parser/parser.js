@@ -13,20 +13,20 @@ function getCenter(nodes, list) {
         for (var j = 0; j < list.length; j++) {
             if (list[j].id === nodes[i]) {
                 nodesCoordinates.push({
-                    lat: list[j].lat,
-                    lon: list[j].lon
+                    latitude: list[j].lat,
+                    longitude: list[j].lon
                 });
             }
         }
     }
     var center = {
-        lat: nodesCoordinates[0].lat,
-        lon: nodesCoordinates[0].lon
+        latitude: nodesCoordinates[0].latitude,
+        longitude: nodesCoordinates[0].longitude
     };
 
     for (i = 1; i < nodesCoordinates.length; i++) {
-        center.lat = (center.lat * i + nodesCoordinates[i].lat) / (i + 1);
-        center.lon = (center.lon * i + nodesCoordinates[i].lon) / (i + 1);
+        center.latitude = (center.latitude * i + nodesCoordinates[i].latitude) / (i + 1);
+        center.longitude = (center.longitude * i + nodesCoordinates[i].longitude) / (i + 1);
     }
 
     return center;
@@ -79,8 +79,8 @@ if (inputDir === undefined || outputFile === undefined) {
                         if (obj.elements[i].tags !== undefined) { // A real feature
                             if (obj.elements[i].type == 'node') { // Simple coordinates, just a node
                                 goodJSON[name].push({
-                                    lat: obj.elements[i].lat,
-                                    lon: obj.elements[i].lon
+                                    latitude: obj.elements[i].lat,
+                                    longitude: obj.elements[i].lon
                                 });
                             } else if (obj.elements[i].type === 'way') { // Multiple coordinates, we need to compute the center
                                 goodJSON[name].push(getCenter(obj.elements[i].nodes, obj.elements));

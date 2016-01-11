@@ -19,8 +19,8 @@ module.exports = {
             type = source.types[i];
             for (var j = 0; j < source[type].length; j++) {
                 features.markers.push({
-                    latitude: source[type][j].lat,
-                    longitude: source[type][j].lon,
+                    latitude: source[type][j].latitude,
+                    longitude: source[type][j].longitude,
                     options: {
                         icon: type
                     }

@@ -201,6 +201,7 @@ function distance(lat1, lon1, lat2, lon2) {
 
 function get(query) {
     $.get('/mapquery', query, function(data) {
+        console.log(data);
         display(data);
     });
 }

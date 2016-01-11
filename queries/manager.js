@@ -5,6 +5,7 @@ var businesses = require('./businesses');
 var example = require('./example');
 var grid_example = require('./grid_example');
 var features = require('./features');
+var hotgrid = require('./hotgrid');
 var hotspots = require('./hotspots');
 var hotzones = require('./hotzones');
 var info = require('./info');
@@ -27,6 +28,9 @@ module.exports = {
                 break;
             case 'grid_example':
                 grid_example.get(parameters, callback);
+                break;
+            case 'hotgrid':
+                hotgrid.get(parameters, callback);
                 break;
             case 'hotzones':
                 hotzones.get(parameters, callback);
@@ -53,6 +57,9 @@ module.exports = {
                 break;
             case 'hotspots':
                 hotspots.test();
+                break;
+            case 'hotgrid':
+                hotgrid.test();
                 break;
             case 'hotzones':
                 hotzones.test();
