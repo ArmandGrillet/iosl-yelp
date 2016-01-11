@@ -9,8 +9,8 @@ module.exports = {
             };
             for (var i = 0; i < grid.features.length; i++) {
                 answer.markers.push({
-                    latitude: getCenter(utils.grid.features[i].geometry.coordinates).latitude,
-                    longitude: getCenter(utils.grid.features[i].geometry.coordinates).longitude
+                    latitude: utils.getCenterTile(grid.features[i].geometry.coordinates).latitude,
+                    longitude: utils.getCenterTile(grid.features[i].geometry.coordinates).longitude
                 });
             }
 

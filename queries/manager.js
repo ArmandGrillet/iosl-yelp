@@ -61,6 +61,9 @@ module.exports = {
             case 'hotgrid':
                 hotgrid.test();
                 break;
+            case 'hotspots':
+                hotzones.test();
+                break;
             case 'hotzones':
                 hotzones.test();
                 break;

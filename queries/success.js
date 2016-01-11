@@ -152,11 +152,17 @@ module.exports = {
                 var source = JSON.parse(data); // Parsing the fatures to manipulate them.
                 getBusinesses(parameters.city, parameters.category, function(businesses) { // We obtain the businesses
                     var answer = {
+                        markers: [],
                         circles: []
                     };
                     var markerPopup = "";
                     var circleColor = "";
                     for (var i = 0; i < businesses.length; i++) {
+                        answer.markers.push({
+                            popup: businesses[i].name,
+                            latitude: businesses[i].latitude,
+                            longitude: businesses[i].longitude
+                        });
                         markerPopup = businesses[i].success + " ";
                         for (var j = 0; j < source.types.length; j++) {
                             if (getNumberOfFeaturesIn150Radius(source.types[j], businesses[i], source[source.types[j]]) > 0) {

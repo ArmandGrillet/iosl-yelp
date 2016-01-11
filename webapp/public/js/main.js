@@ -94,7 +94,6 @@ function display(data) {
     if (data.error !== undefined) {
         alert(data.error);
     } else {
-        console.log(data);
         markersLayer.clearLayers(); // We clean the map
         var position, popup; // Position and popup of an element.
         var i; // Loop to go through the elements.
