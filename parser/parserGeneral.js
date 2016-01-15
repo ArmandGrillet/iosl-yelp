@@ -65,10 +65,8 @@ if (inputDir === undefined || outputFile === undefined) {
                     if (err) {
                         throw err;
                     }
-                    // Getting the name of the feature from its filename.
-                    var name = file.substring(file.indexOf('_') + 1);
-                    name = name.replace(/_[A-Za-z0-9_]+.json/, '');
 
+                    var name = file.replace(/_[A-Za-z0-9_]+.json/, '');
                     obj = JSON.parse(data); // Parsing the JSON
                     for (var i = 0; i < obj.elements.length; i++) { // Analyzing each element in it.
                         if (i === 0) { // First element analyzed in this JSON, we're adding the feature and creating an array to store the coordinates for this feature.
