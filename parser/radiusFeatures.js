@@ -6,68 +6,74 @@ var json2csv = require('json2csv');
 var parserUtils = require('./parserUtils.js');
 var utils = require('../queries/utils');
 
-var city;
-var category;
-var outputFile;
-var distance;
+var inputFile; // Name of the ouput file (without file extension)
+var city; // Name of the city where we have to proceed
+var category; // Category of businesses observed
+var radius;
 
 // Processing the parameters.
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            city = utils.capitalizeFirstLetter(val);
+            inputFile = val;
             break;
         case 3:
-            category = utils.capitalizeFirstLetter(val);
+            city = utils.capitalizeFirstLetter(val);
             break;
         case 4:
-            outputFile = val;
+            category = utils.capitalizeFirstLetter(val);
             break;
         case 5:
-            distance = parseInt(val);
+            radius = parseInt(val);
             break;
         default:
             break;
     }
 });
 
-if (city === undefined || category === undefined || outputFile === undefined || isNaN(distance)) {
-    console.log("Usage: node nearestFeatures CITY BUSINESS OUTPUTFILE DISTANCE. E.g. 'node radiusFeatures City Bars cityBars 100' will create a cityBars.csv file");
+if (inputFile === undefined || city === undefined || category === undefined || isNaN(radius)) {
+    console.log('Usage: node nearestFeatures INPUTFILE CITY CATEGORY RADIUS. E.g. \'node radiusFeatures ./features-city.json City Bars 100\' will create a cityBars100.csv file');
 } else {
-    fs.readFile(utils.featuresPath(city), 'utf8', function(err, data) {
+    fs.readFile(inputFile, 'utf8', function(err, data) {
         if (err) {
             return console.log(err);
         }
         var source = JSON.parse(data); // Parsing the JSON features
-        parserUtils.getBusinesses(city, category, function(businesses) {
-            businesses = parserUtils.addSuccess(businesses);
-            var fields = ['name', 'success'].concat(source.types);
-            var rows = [];
+        parserUtils.isDrillRunning(function(running) {
+            if (running === false) {
+                console.log('Start Apache Drill before running this algorithm');
+            } else {
+                parserUtils.getBusinesses(city, category, function(businesses) {
+                    businesses = parserUtils.addSuccess(businesses);
+                    var fields = ['name', 'success'].concat(source.types);
+                    var rows = [];
 
-            var row;
-            var type;
-            for (var i = 0; i < businesses.length; i++) {
-                row = {
-                    "name": businesses[i].name,
-                    "success": businesses[i].success
-                };
-                for (var j = 2; j < fields.length; j++) {
-                    row[fields[j]] = parserUtils.getNumberOfFeaturesforRadius(businesses[i], distance, source[fields[j]]);
-                }
-                rows.push(row);
-            }
+                    var row;
+                    var type;
+                    for (var i = 0; i < businesses.length; i++) {
+                        row = {
+                            'name': businesses[i].name,
+                            'success': businesses[i].success
+                        };
+                        for (var j = 2; j < fields.length; j++) {
+                            row[fields[j]] = parserUtils.getNumberOfFeaturesforRadius(businesses[i], radius, source[fields[j]]);
+                        }
+                        rows.push(row);
+                    }
 
-            json2csv({
-                data: rows,
-                fields: fields
-            }, function(err, csv) {
-                if (err) console.log(err);
-                fs.writeFile("./" + outputFile + '.csv', csv, function(err) {
-                    if (err)
-                        throw err;
-                    console.log(outputFile + ' saved.');
+                    json2csv({
+                        data: rows,
+                        fields: fields
+                    }, function(err, csv) {
+                        if (err) console.log(err);
+                        fs.writeFile('./' + city + '-' + category + '-' + radius + '.csv', csv, function(err) {
+                            if (err)
+                                throw err;
+                            console.log('File saved: ' + __dirname + '/' + city + '-' + category + '-' + radius + '.csv');
+                        });
+                    });
                 });
-            });
+            }
         });
     });
 }

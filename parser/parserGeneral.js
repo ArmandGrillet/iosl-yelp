@@ -48,7 +48,7 @@ process.argv.forEach(function(val, index, array) {
 });
 
 if (inputDir === undefined || outputFile === undefined) {
-    console.log("Usage: node parser INPUTDIRECTORY OUTPUTFILE. E.g. 'node parser path/to/city/ city' will create a city.json");
+    console.log('Usage: node parser INPUTDIRECTORY OUTPUTFILE. E.g. \'node parser path/to/city/ city\' will create a city.json');
 } else { // All the parameters are here, we can parse the input directory to create the JSON.
     var obj;
     var goodJSON = {
@@ -102,11 +102,11 @@ if (inputDir === undefined || outputFile === undefined) {
             if (err) {
                 console.log(err);
             } else { // All the files have been processed without error, we can write the output file.
-                fs.writeFile("./" + outputFile + ".json", JSON.stringify(goodJSON), function(err) {
+                fs.writeFile('./' + outputFile + '.json', JSON.stringify(goodJSON), function(err) {
                     if (err) {
                         return console.log(err);
                     }
-                    console.log(outputFile + " was saved!");
+                    console.log(outputFile + ' was saved!');
                 });
             }
         });

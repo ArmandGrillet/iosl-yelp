@@ -7,7 +7,8 @@
         "async": "latest",
         "fs": "latest",
         "path": "latest",
-        "json2csv": "latest"
+        "json2csv": "latest",
+        "tcp-port-used": "latest"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"

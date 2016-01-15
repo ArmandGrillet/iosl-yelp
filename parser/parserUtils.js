@@ -1,6 +1,7 @@
 /*jslint node: true */
 'use strict';
 var utils = require('../queries/utils');
+var tcpPortUsed = require('tcp-port-used');
 
 module.exports = {
     addSuccess: function(businesses) {
@@ -45,6 +46,14 @@ module.exports = {
         }
         return businessesWithSuccess;
     },
+    isDrillRunning: function(callback) {
+        tcpPortUsed.check(8047) // localhost:8047 = Apache Drill
+            .then(function(inUse) {
+                callback(inUse);
+            }, function(err) {
+                callback(false);
+            });
+    },
     /*
     Function to get the number of checkins per week for a business.
         id = id of the business
@@ -77,6 +86,7 @@ module.exports = {
             - All the checkins
             - All the businesses in the city in a specific category.
         */
+        var superThis = this;
         utils.askDrill("SELECT table_business.business_id, table_checkin.checkin_info from " + utils.datasetPath('checkin') + " AS table_checkin INNER JOIN " + utils.datasetPath('business') + " AS table_business ON table_checkin.business_id = table_business.business_id WHERE table_business.city = '" + city + "' AND true=repeated_contains(table_business.categories,'" + category + "')", function(checkins) {
             utils.askDrill("select business_id, name, total_checkins, stars, review_count, latitude, longitude from " + utils.datasetPath('business') + " WHERE city='" + city + "' AND true=repeated_contains(categories,'" + category + "')", function(rawBusinesses) {
                 var businesses = [];
@@ -88,7 +98,7 @@ module.exports = {
                         'longitude': rawBusinesses.rows[i].longitude,
                         'stars': rawBusinesses.rows[i].stars,
                         'reviews': rawBusinesses.rows[i].review_count,
-                        'checkins': this.checkinsForId(rawBusinesses.rows[i].business_id, checkins)
+                        'checkins': superThis.checkinsForId(rawBusinesses.rows[i].business_id, checkins)
                     });
                 }
                 callback(businesses);
