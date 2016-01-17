@@ -1,6 +1,6 @@
-var map;
-var markersLayer;
-var cities = {
+var map; // Will be use to be the LeafLet map.
+var UILayer; // The layer on the map containing all the markers/circles/tiles we're displaying.
+var cities = { // Cities we show in the webapp with their coordinates.
     'Pittsburgh': {
         latitude: 40.440625,
         longitude: -79.995886
@@ -42,72 +42,87 @@ var cities = {
         longitude: -3.188267
     },
 };
-window.onload = function() {
-    map = L.map('map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15);
-    markersLayer = new L.LayerGroup().addTo(map);
 
-    // Downloading the map layer
+// Once the .html page is loaded, we execute this code.
+window.onload = function() {
+    map = L.map('map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15); // Sets the view to be in Edinburgh with a zoom level of 15.
+    UILayer = new L.LayerGroup().addTo(map); // Adds the layer to the map object.
+
+    // Downloads the map layer's data.
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         minZoom: 10,
         maxZoom: 18,
         attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    $('#clean').on('click', clearLayers);
+    $('#clear').on('click', clearUILayer); // Clear the UI layer on the map by using the function.
 
+    // When a user clicks on "Run"
     $('#run-request').on('click', function() {
-        var request = $('#request').val();
-        var query = {};
+        var request = $('#request').val(); // Get the request
+        var query = {}; // The query will be the object sent to the server, it needs some info.
+        // Give the latitude and longitude of the query by getting the center of the map displayed.
         query.latitude = map.getCenter().lat;
         query.longitude = map.getCenter().lng;
 
+        // Get the city displayed on the map.
         query.city = getNearestCity(query.latitude, query.longitude);
+
+        // The request has some parameters.
         if (request.indexOf('?') > -1) {
+            // Set the algorithm valuer, it is the string before the '?'
             query.algorithm = request.substr(0, request.indexOf('?'));
 
-            var otherParameters = request.substring(request.indexOf('?') + 1).split('&');
-            for (var i = 0; i < otherParameters.length; i++) {
-                var parameter = otherParameters[i].split('=');
-                query[parameter[0]] = parameter[1];
+            // Get all the parameters of the request.
+            var parameters = request.substring(request.indexOf('?') + 1).split('&');
+            for (var i = 0; i < parameters.length; i++) {
+                var parameter = parameters[i].split('=');
+                query[parameter[0]] = parameter[1]; // Create a JSON value on the fly.
             }
-        } else {
+        } else { // The request doesn't have parameters, the algorithm is simply the input.
             query.algorithm = request;
         }
 
-        if (query.algorithm === undefined) {
-            console.log('Query is not correct');
-        } else {
-            get(query);
+
+        if (query.algorithm === undefined) { // Syntax error, alert the user.
+            alert('The format of your query is not correct.');
+        } else { // Everything looks fine, we send the query to the server, check app.js for the routing.
+            $.get('/mapquery', query, function(data) {
+                display(data);
+            });
         }
     });
 
-    $(".select").change(function() {
+    // When the user selects a new city we move the map's center to the city selected using moveTo().
+    $("#cities").change(function() {
         moveTo($(this).children(":selected").val());
     });
 };
 
-function clearLayers() {
-    markersLayer.clearLayers();
+// Clear the UI layer, we do not use UILayer.clearLayers() so that we can use the function directly as a callback, e.g. $('#clear').on('click', clearUILayer);
+function clearUILayer() {
+    UILayer.clearLayers();
 }
 
+// Display the data returned by the queries.
 function display(data) {
-    if (data.error !== undefined) {
+    if (data.error !== undefined) { // There is an error, we show it.
         alert(data.error);
-    } else {
-        markersLayer.clearLayers(); // We clean the map
+    } else { // Only data, we display it on the map.
+        UILayer.clearUILayer(); // We clean the map first so that the previous data displayed isn't here anymore.
         var position, popup; // Position and popup of an element.
         var i; // Loop to go through the elements.
-        if (data.position !== undefined) {
-            console.log(data.position);
+        if (data.position !== undefined) { // Do we have to move on a particular location?
             map.panTo(new L.LatLng(data.position.latitude, data.position.longitude));
-            if (data.position.zoom !== undefined) {
+            if (data.position.zoom !== undefined) { // Do we have to set a particular level of zoom?
                 map.setZoom(data.position.zoom);
             }
         }
-        if (data.markers !== undefined) {
+        if (data.markers !== undefined) { // There are markers, we display them using the LeafLet API.
             var markers = data.markers;
+            var markerParameters;
             for (i = 0; i < markers.length; i++) {
-                var markerParameters = markers[i];
+                markerParameters = markers[i];
 
                 position = {
                     latitude: markerParameters.latitude,
@@ -118,11 +133,10 @@ function display(data) {
 
                 marker = L.marker([position.latitude, position.longitude], markerParameters.options);
                 if (markerParameters.popup !== undefined) {
-                    console.log("On a une popup");
                     marker.bindPopup(markerParameters.popup);
                 }
                 if (markerParameters.options !== undefined) {
-                    if (markerParameters.options.onclick === true) {
+                    if (markerParameters.options.onclick === true) { // This option is not part of the API, if the value onclick is set to true we will fire an event when the user clicks on the marker using markerClick().
                         marker.on('click', markerClick);
                     }
                     if (markerParameters.options.icon !== undefined) {
@@ -134,11 +148,11 @@ function display(data) {
                         }));
                     }
                 }
-                marker.addTo(markersLayer);
+                marker.addTo(UILayer);
             }
         }
 
-        if (data.circles !== undefined) {
+        if (data.circles !== undefined) { // There are circles, we display them using the LeafLet API.
             var circles = data.circles;
             for (i = 0; i < circles.length; i++) {
                 var circleParameters = circles[i];
@@ -155,15 +169,15 @@ function display(data) {
                 if (circleParameters.popup !== '') {
                     popup = circleParameters.popup;
                     delete circleParameters.popup;
-                    var circle = L.circle([position.latitude, position.longitude], radius, circleParameters.options).addTo(markersLayer);
+                    var circle = L.circle([position.latitude, position.longitude], radius, circleParameters.options).addTo(UILayer);
                     circle.bindPopup(popup);
                 } else {
-                    L.marker([position.latitude, position.longitude], radius, circleParameters.options).addTo(markersLayer);
+                    L.marker([position.latitude, position.longitude], radius, circleParameters.options).addTo(UILayer);
                 }
             }
         }
 
-        if (data.polygons !== undefined) {
+        if (data.polygons !== undefined) { // There are polygons, we display them using the LeafLet API.
             var polygons = data.polygons;
             for (i = 0; i < polygons.length; i++) {
                 var points = [];
@@ -174,16 +188,17 @@ function display(data) {
                 if (polygons[i].popup !== '') {
                     popup = polygons[i].popup;
                     delete polygons[i].popup;
-                    var polygon = L.polygon(points, polygons[i].options).addTo(markersLayer);
+                    var polygon = L.polygon(points, polygons[i].options).addTo(UILayer);
                     polygon.bindPopup(popup);
                 } else {
-                    L.polygon(points, polygons[i].options).addTo(markersLayer);
+                    L.polygon(points, polygons[i].options).addTo(UILayer);
                 }
             }
         }
     }
 }
 
+// Calculate the distance between two positions.
 function distance(lat1, lon1, lat2, lon2) {
     var radlat1 = Math.PI * lat1 / 180;
     var radlat2 = Math.PI * lat2 / 180;
@@ -198,13 +213,7 @@ function distance(lat1, lon1, lat2, lon2) {
     return dist;
 }
 
-function get(query) {
-    $.get('/mapquery', query, function(data) {
-        console.log(data);
-        display(data);
-    });
-}
-
+// Get the nearest city in cities using the coordinates of the center of the map and the function distance().
 function getNearestCity(latitude, longitude) {
     var nearestCity, smallestDistance;
     for (var city in cities) {
@@ -217,22 +226,25 @@ function getNearestCity(latitude, longitude) {
     return nearestCity;
 }
 
+// Event hander if there is a click on a marker that has a "onclick" event.
 function markerClick(e) {
     if (this.options.alt !== undefined) {
+        // We create a small query to use the info algorithm.
         var query = {};
         query.algorithm = 'info';
-        query.business_id = this.options.alt;
+        query.business_id = this.options.alt; // We're using the alt option to get the business id.
 
         $.get('/infoquery', query, function(data) {
-            $('#marker-info').text(JSON.stringify(data));
+            $('#marker-info').text(JSON.stringify(data)); // Display what is returned by info.
         });
     }
 }
 
+// Changes the mapt's center to be in the parameter city.
 function moveTo(city) {
     if (cities[city] !== undefined) {
         map.panTo(new L.LatLng(cities[city].latitude, cities[city].longitude));
     } else {
-        console.log('City is not in the Yelp dataset');
+        alert('The city selected is not in our database.');
     }
 }
