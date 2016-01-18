@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="">
+
+	<meta name="author" content="IoSL - Yelp team">
+	<title>IoSL - Yelp</title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.red-blue.min.css"	>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+	<!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/style-prod.css">
+
+
+	<!-- JS -->
+	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="js/prod.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+
+		<div class="container" id ="map-column">
+      <div id="map"></div>
+		</div>
+
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">
+          	IoSL - Yelp
+          </a>
+        </div>
+				<div class="selectmenu">
+					<select class="select" id="cities">
+						<option value="Edinburgh" selected>Edinburgh</option>
+					  <option value="Pittsburgh">Pittsburgh</option>
+						<option value="Charlotte">Charlotte</option>
+				  	<option value="Champaign">Champaign</option>
+				  	<option value="Phoenix">Phoenix</option>
+						<option value="Las Vegas">Las Vegas</option>
+						<option value="Madison">Madison</option>
+						<option value="Montreal">Montreal</option>
+						<option value="Waterloo">Waterloo</option>
+						<option value="Karlsruhe">Karlsruhe</option>
+					</select>
+					<select class="select" id="category">
+						<option value="Edinburgh" selected>Bars</option>
+						<option value="Pittsburgh">Cafe</option>
+						<option value="Charlotte">Fast Food</option>
+					</select>
+					<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-1">
+  				<input type="radio" id="option-1" class="mdl-radio__button" name="options" value="1" checked>
+  				<span class="mdl-radio__label">Success by tiles</span>
+					</label>
+					<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-2">
+  				<input type="radio" id="option-2" class="mdl-radio__button" name="options" value="2">
+  				<span class="mdl-radio__label">Success by business</span>
+					</label>
+				</div>
+      </div>
+    </nav>
+
+
+</body>
+</html>
