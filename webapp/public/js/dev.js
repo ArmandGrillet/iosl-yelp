@@ -45,7 +45,7 @@ var cities = { // Cities we show in the webapp with their coordinates.
 
 // Once the .html page is loaded, we execute this code.
 window.onload = function() {
-    map = L.map('map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15); // Sets the view to be in Edinburgh with a zoom level of 15.
+    map = L.map('map-dev').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15); // Sets the view to be in Edinburgh with a zoom level of 15.
     UILayer = new L.LayerGroup().addTo(map); // Adds the layer to the map object.
 
     // Downloads the map layer's data.
@@ -109,7 +109,7 @@ function display(data) {
     if (data.error !== undefined) { // There is an error, we show it.
         alert(data.error);
     } else { // Only data, we display it on the map.
-        UILayer.clearUILayer(); // We clean the map first so that the previous data displayed isn't here anymore.
+        clearUILayer(); // We clean the map first so that the previous data displayed isn't here anymore.
         var position, popup; // Position and popup of an element.
         var i; // Loop to go through the elements.
         if (data.position !== undefined) { // Do we have to move on a particular location?
