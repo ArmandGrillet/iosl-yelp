@@ -59,7 +59,6 @@ if (inputFile === undefined || city === undefined || category === undefined || i
                         for (var j = 0; j < businesses.length; j++) {
                             if (i != j) {
                                 distance = 1000 * utils.distance(businesses[i].latitude, businesses[i].longitude, businesses[j].latitude, businesses[j].longitude);
-                                console.log(distance + ' ' + radius);
                                 if (distance <= radius) {
                                     row['same businesses in radius']++;
                                 }
