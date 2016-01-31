@@ -17,8 +17,11 @@ process.argv.forEach(function(val, index, array) {
             inputFile = val;
             break;
         case 3:
-            city = utils.capitalizeFirstLetter(val);
-            break;
+            if (val === 'LV') {
+                city = 'Las Vegas';
+            } else {
+                city = utils.capitalizeFirstLetter(val);
+            }
         case 4:
             category = utils.capitalizeFirstLetter(val);
             break;

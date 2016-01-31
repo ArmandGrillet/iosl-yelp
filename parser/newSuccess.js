@@ -66,7 +66,11 @@ var distance;
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            city = utils.capitalizeFirstLetter(val);
+            if (val === 'LV') {
+                city = 'Las Vegas';
+            } else {
+                city = utils.capitalizeFirstLetter(val);
+            }
             break;
         case 3:
             category = utils.capitalizeFirstLetter(val);

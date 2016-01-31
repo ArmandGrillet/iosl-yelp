@@ -68,36 +68,6 @@ function gridForBusinesses(businesses) {
     return grid;
 }
 
-function writeGrid(city, grid) {
-    var json = {
-        "type": "FeatureCollection",
-        "features": []
-    };
-    var i, j;
-    for (i = 0; i < grid.length; i++) {
-        for (j = 0; j < grid[i].length; j++) {
-            if (grid[i][j].business_ids.length > 0) {
-                json.features.push({
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [
-                            [grid[i][j].points[0].latitude, grid[i][j].points[0].longitude],
-                            [grid[i][j].points[1].latitude, grid[i][j].points[1].longitude],
-                            [grid[i][j].points[2].latitude, grid[i][j].points[2].longitude],
-                            [grid[i][j].points[3].latitude, grid[i][j].points[3].longitude]
-                        ]
-                    },
-                    "properties": {
-                        "business_ids": grid[i][j].business_ids
-                    }
-                });
-            }
-        }
-    }
-    fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
-}
-
 module.exports = {
     askDrill: function(query, callback) {
         request.post(

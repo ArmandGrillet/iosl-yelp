@@ -12,7 +12,7 @@ module.exports = {
             var gridPolygons = [];
             var i;
             for (i = 0; i < grid.features.length; i++) {
-                if (grid.features[i].properties.business_ids.length >= 2) { // There is at least 2 businesses in the area.
+                if (grid.features[i].properties.business_ids.length >= 0) { // There is at least 2 businesses in the area.
                     gridPolygons.push({
                         points: [
                             {
@@ -32,7 +32,7 @@ module.exports = {
                                 longitude: grid.features[i].geometry.coordinates[3][1]
                             }
                         ],
-                        popup: grid.features[i].properties.business_ids.length.toString(),
+                        popup: '_[' + utils.getCenterTile(grid.features[i].geometry.coordinates).latitude + ', ' + utils.getCenterTile(grid.features[i].geometry.coordinates).longitude + '],',
                         options: {}
                     });
                 }

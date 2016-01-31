@@ -13,7 +13,11 @@ var city; // Name of the city where we have to proceed
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            city = utils.capitalizeFirstLetter(val);
+            if (val === 'LV') {
+                city = 'Las Vegas';
+            } else {
+                city = utils.capitalizeFirstLetter(val);
+            }
             break;
         default:
             break;
