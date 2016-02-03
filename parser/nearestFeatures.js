@@ -14,19 +14,20 @@ var category; // Category of businesses observed
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            inputFile = val;
-            break;
+        inputFile = val;
+        break;
         case 3:
-            if (val === 'LV') {
-                city = 'Las Vegas';
-            } else {
-                city = utils.capitalizeFirstLetter(val);
-            }
+        if (val === 'LV') {
+            city = 'Las Vegas';
+        } else {
+            city = utils.capitalizeFirstLetter(val);
+        }
+        break;
         case 4:
-            category = utils.capitalizeFirstLetter(val);
-            break;
+        category = utils.capitalizeFirstLetter(val);
+        break;
         default:
-            break;
+        break;
     }
 });
 
@@ -47,13 +48,13 @@ if (inputFile === undefined || city === undefined || category === undefined) { /
                     /*
                     The 'fields' variable corresponds to the columns of the .csv file
                     We have :
-                        - One column for the business' name
-                        - One column for its success
-                        - Many columns corresponding to the minimal distance to a specific feature (name of the column = name of the feature)
+                    - One column for the business' name
+                    - One column for its success
+                    - Many columns corresponding to the minimal distance to a specific feature (name of the column = name of the feature)
                     */
                     var fields = ['name', 'success'].concat(source.types); // The two first colmuns: name of the business and its success
                     var rows = []; // Array containing the JSON rows, a JSON row correspond to a business
-
+                    
                     var row = {}; // We use this JSON file to store one row before pushing it to the array.
                     for (var i = 0; i < businesses.length; i++) {
                         row = {
@@ -65,7 +66,7 @@ if (inputFile === undefined || city === undefined || category === undefined) { /
                         }
                         rows.push(row); // We push the business to the array containing all of them.
                     }
-
+                    
                     json2csv({ // We use the json2csv module to transform our json objects into a .csv file.
                         data: rows,
                         fields: fields
@@ -76,7 +77,7 @@ if (inputFile === undefined || city === undefined || category === undefined) { /
                         // We write the file in the same directory as the parser, using the name given by the user as an input.
                         fs.writeFile('./' + city + '-' + category + '.csv', csv, function(err) {
                             if (err)
-                                throw err;
+                            throw err;
                             console.log('File saved: ' + __dirname + '/' + city + '-' + category + '.csv');
                         });
                     });

@@ -15,23 +15,23 @@ var radius;
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            inputFile = val;
-            break;
+        inputFile = val;
+        break;
         case 3:
-            if (val === 'LV') {
-                city = 'Las Vegas';
-            } else {
-                city = utils.capitalizeFirstLetter(val);
-            }
-            break;
+        if (val === 'LV') {
+            city = 'Las Vegas';
+        } else {
+            city = utils.capitalizeFirstLetter(val);
+        }
+        break;
         case 4:
-            category = utils.capitalizeFirstLetter(val);
-            break;
+        category = utils.capitalizeFirstLetter(val);
+        break;
         case 5:
-            radius = parseInt(val);
-            break;
+        radius = parseInt(val);
+        break;
         default:
-            break;
+        break;
     }
 });
 
@@ -68,13 +68,13 @@ if (inputFile === undefined || city === undefined || category === undefined || i
                                 }
                             }
                         }
-
+                        
                         for (var k = 0; k < source.types.length; k++) {
                             row[source.types[k]] = parserUtils.getNumberOfFeaturesforRadius(businesses[i], radius, source[source.types[k]]);
                         }
                         rows.push(row);
                     }
-
+                    
                     json2csv({
                         data: rows,
                         fields: fields
@@ -82,7 +82,7 @@ if (inputFile === undefined || city === undefined || category === undefined || i
                         if (err) console.log(err);
                         fs.writeFile('./' + city + '-' + category + '-' + radius + '.csv', csv, function(err) {
                             if (err)
-                                throw err;
+                            throw err;
                             console.log('File saved: ' + __dirname + '/' + city + '-' + category + '-' + radius + '.csv');
                         });
                     });

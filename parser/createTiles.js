@@ -101,11 +101,11 @@ var cities = { // Cities we show in the webapp with their coordinates.
 function metersToDegrees(distance, latitude) {
     //Earth’s radius, sphere
     var radius = 6378137;
-
+    
     //Coordinate offsets in radians
     var newLatitude = distance / radius;
     var newLongitude = distance / (radius * Math.cos(Math.PI * latitude / 180));
-
+    
     //OffsetPosition, decimal degrees
     return {
         'latitude': newLatitude * 180 / Math.PI,
@@ -119,14 +119,14 @@ var city; // Name of the city where we have to proceed
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-            if (val === 'LV') {
-                city = 'Las Vegas';
-            } else {
-                city = utils.capitalizeFirstLetter(val);
-            }
-            break;
+        if (val === 'LV') {
+            city = 'Las Vegas';
+        } else {
+            city = utils.capitalizeFirstLetter(val);
+        }
+        break;
         default:
-            break;
+        break;
     }
 });
 
@@ -136,7 +136,7 @@ if (city === undefined) {
 
 getAllBusinessesIn(city, function(businesses) {
     var metersInCoordinates = metersToDegrees(250, cities[city].latitude);
-
+    
     var minLat, maxLat, minLon, maxLon;
     if (cities[city].south < cities[city].north) {
         minLat = cities[city].south;
@@ -145,7 +145,7 @@ getAllBusinessesIn(city, function(businesses) {
         minLat = cities[city].north;
         maxLat = cities[city].south;
     }
-
+    
     if (cities[city].east < cities[city].west) {
         minLon = cities[city].east;
         maxLon = cities[city].west;
@@ -153,16 +153,15 @@ getAllBusinessesIn(city, function(businesses) {
         minLon = cities[city].west;
         maxLon = cities[city].east;
     }
-
-
+    
     var json = {
         "type": "FeatureCollection",
         "features": []
     };
-
+    
     var businessesInTile = [];
     var i, j, k;
-
+    
     for (i = minLat; i < maxLat; i += metersInCoordinates.latitude) {
         for (j = minLon; j < maxLon; j += metersInCoordinates.longitude) {
             businessesInTile = [];
@@ -188,5 +187,30 @@ getAllBusinessesIn(city, function(businesses) {
             });
         }
     }
-    fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
+    // Adding the features
+    fs.readFile('../static/features/' + city + '.json', 'utf8', function(err, data) { // Getting the features
+        if (err) {
+            return console.log(err);
+        }
+        var source = JSON.parse(data); // Parsing the fatures to manipulate them.
+        parserUtils.isDrillRunning(function(running) {
+            if (running === false) {
+                console.log('Start Apache Drill before running this algorithm');
+            } else {
+                var centerTile;
+                for (var i = 0; i < json.features.length; i++) {
+                    centerTile = utils.getCenterTile(json.features[i].geometry.coordinates);
+                    for (var j = 0; j < source.types.length; j++) {
+                        if (['atm', 'stadium', 'convenience', 'restaurant', 'bank', 'toilets', 'kindergarten', 'guest', 'theatre', 'college', 'gallery', 'museum', 'courthouse'].indexOf(source.types[j]) != -1) {
+                            json.features[i].properties[source.types[j]] = Math.round(parserUtils.getDistanceToNearestElement(centerTile, source[source.types[j]]) * 1000);
+                            if (source.types[j] == 'atm') {
+                                json.features[i].properties['atm.1'] = parserUtils.getNumberOfFeaturesforRadius(centerTile, 100, source[source.types[j]]);
+                            }
+                        }
+                    }
+                }
+            }
+            fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
+        });
+    });
 });
