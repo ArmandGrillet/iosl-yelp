@@ -30,6 +30,6 @@ app.get('/infoquery', function(req, res) {
 
 var server = app.listen(1337, function() {
     var port = server.address().port;
-
+    
     console.log('Listening on port %s', port);
 });

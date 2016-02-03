@@ -45,30 +45,30 @@ var cities = { // Cities we show in the webapp with their coordinates.
 
 // Once the .html page is loaded, we execute this code.
 window.onload = function() {
-    map = L.map('map-prod').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15); // Sets the view to be in Edinburgh with a zoom level of 15.
+    map = L.map('prod-map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15); // Sets the view to be in Edinburgh with a zoom level of 15.
     UILayer = new L.LayerGroup().addTo(map); // Adds the layer to the map object.
-
+    
     // Downloads the map layer's data.
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         minZoom: 10,
         maxZoom: 18,
         attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
-
+    
     // When the user selects a new city we move the map's center to the city selected using moveTo().
     $("#cities").change(function() {
         moveTo($(this).children(":selected").val());
         request($(this).children(":selected").val(), $("#categories").children(":selected").val());
     });
-
+    
     $("#categories").change(function() {
         request($("#cities").children(":selected").val(), $(this).children(":selected").val());
     });
-
+    
     $("input[name='algorithm']").change(function() {
         request($("#cities").children(":selected").val(), $("#categories").children(":selected").val());
     });
-
+    
     // We're doing a first request
     request($("#cities").children(":selected").val(), $("#categories").children(":selected").val());
 };
@@ -97,14 +97,14 @@ function display(data) {
             var markerParameters;
             for (i = 0; i < markers.length; i++) {
                 markerParameters = markers[i];
-
+                
                 position = {
                     latitude: markerParameters.latitude,
                     longitude: markerParameters.longitude
                 };
                 delete markerParameters.latitude;
                 delete markerParameters.longitude;
-
+                
                 marker = L.marker([position.latitude, position.longitude], markerParameters.options);
                 if (markerParameters.popup !== undefined) {
                     marker.bindPopup(markerParameters.popup);
@@ -125,7 +125,7 @@ function display(data) {
                 marker.addTo(UILayer);
             }
         }
-
+        
         if (data.circles !== undefined) { // There are circles, we display them using the LeafLet API.
             var circles = data.circles;
             for (i = 0; i < circles.length; i++) {
@@ -136,10 +136,10 @@ function display(data) {
                 };
                 delete circleParameters.latitude;
                 delete circleParameters.latitude;
-
+                
                 var radius = circleParameters.radius;
                 delete circleParameters.radius;
-
+                
                 if (circleParameters.popup !== '') {
                     popup = circleParameters.popup;
                     delete circleParameters.popup;
@@ -150,7 +150,7 @@ function display(data) {
                 }
             }
         }
-
+        
         if (data.polygons !== undefined) { // There are polygons, we display them using the LeafLet API.
             var polygons = data.polygons;
             for (i = 0; i < polygons.length; i++) {
@@ -179,13 +179,13 @@ function request(city, category) {
         'city': city,
         'category': category
     };
-
+    
     if ($('#businesses-algorithm').is(':checked')) {
         query.algorithm = "businesses";
     } else {
         query.algorithm = "hotgrid";
     }
-
+    
     $.get('/mapquery', query, function(data) {
         display(data);
     });

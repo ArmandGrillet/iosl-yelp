@@ -4,37 +4,36 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" href="./icon.ico">
-
+	
 	<meta name="author" content="IoSL - Yelp team">
 	<title>IoSL - Yelp</title>
 	<meta name="description" content="">
 	<meta name="keywords" content="">
-
+	
 	<!-- CSS -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
-	<!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/style.css">
-
+	
 	<!-- JS -->
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="js/prod.js"></script>
-
+	
 </head>
-
 <body>
-	<div id="map-prod"></div>
-
-	<div id="bar-bottom">
-		<div class="left clear">
-			<img src="icon.png" alt="IoSL Logo" id="logo">
-			<b>IoSL - Yelp</b>
-
-		</div>
-		<div class="right">
-			City:&nbsp;
-			<select class="select" id="cities">
+	<div id="prod-options">
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<img alt="IoSL Logo" src="icon.png">
+					<div id="brand">IoSL - Yelp</div>
+				</div>
+			</div>
+		</nav>
+		<div id="prod-form">
+			<label>City</label>
+			<select class="form-control" id="cities">
 				<option value="Edinburgh" selected>Edinburgh</option>
 				<option value="Pittsburgh">Pittsburgh</option>
 				<option value="Charlotte">Charlotte</option>
@@ -46,18 +45,25 @@
 				<option value="Waterloo">Waterloo</option>
 				<option value="Karlsruhe">Karlsruhe</option>
 			</select>
-			&nbsp;&nbsp;&nbsp;
-			Category:&nbsp;
-			<select class="select" id="categories">
+			<br />
+			<label>Category</label>
+			<select class="form-control" id="categories">
 				<option value="Bars" selected>Bars</option>
 				<option value="Cafe">Cafe</option>
 				<option value="Fast Food">Fast Food</option>
 			</select>
-			&nbsp;&nbsp;&nbsp;
-  			Existing businesses  <input type="radio" name="algorithm" value="businesses" id="businesses-algorithm" checked>
-			&nbsp;&nbsp;&nbsp;
-  			Prediction of success  <input type="radio" name="algorithm" value="hotgrid" id="hotgrid-algorithm">
+			<br />
+			<input type="radio" name="algorithm" value="businesses" id="businesses-algorithm" checked> Existing businesses
+			<br />
+			<input type="radio" name="algorithm" value="hotgrid" id="hotgrid-algorithm"> Prediction of success
 		</div>
+		<br />
+		<br />
+		
 	</div>
+</div>
+<div id="prod-map">
+</div>
+</div>
+</div>
 </body>
-</html>
