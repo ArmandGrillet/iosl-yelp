@@ -60,7 +60,7 @@ window.onload = function() {
         if (!isLoading()) {
             hideBusinessInfo();
             moveTo($(this).children(':selected').val());
-            request($(this).children(':selected').val(), $('#categories').children(':selected').val());
+            request();
         } else {
             return false;
         }
@@ -68,7 +68,16 @@ window.onload = function() {
 
     $('#categories').change(function() {
         if (!isLoading()) {
-            request($('#cities').children(':selected').val(), $(this).children(':selected').val());
+            request();
+            hideBusinessInfo();
+        } else {
+            return false;
+        }
+    });
+
+    $('#score').change(function() {
+        if (!isLoading()) {
+            request();
             hideBusinessInfo();
         } else {
             return false;
@@ -76,7 +85,7 @@ window.onload = function() {
     });
 
     // We're doing a first request
-    request($('#cities').children(':selected').val(), $('#categories').children(':selected').val());
+    request();
 
     // Managing the switch
     $('#businesses').click(function() {
@@ -84,7 +93,7 @@ window.onload = function() {
             $(this).attr('class', 'btn btn-primary active');
             $('#hotgrid').attr('class', 'btn btn-default');
             displayOptions('businesses');
-            request($('#cities').children(':selected').val(), $('#categories').children(':selected').val());
+            request();
         }
     });
 
@@ -94,7 +103,7 @@ window.onload = function() {
             $('#businesses').attr('class', 'btn btn-default');
             hideBusinessInfo();
             displayOptions('hotgrid');
-            request($('#cities').children(':selected').val(), $('#categories').children(':selected').val());
+            request();
         }
     });
 };
@@ -224,18 +233,19 @@ function displayOptions(algorithm) {
     $('#' + algorithm + '-options').show();
 }
 
-function request(city, category) {
+function request() {
     var query = {
         'latitude': map.getCenter().lat,
         'longitude': map.getCenter().lng,
-        'city': city,
-        'category': category
+        'city': $('#cities').children(':selected').val(),
+        'category': $('#categories').children(':selected').val()
     };
 
     if ($('#businesses').attr('class') === 'btn btn-primary active') {
         query.algorithm = 'businesses';
     } else {
         query.algorithm = 'hotgrid';
+        query.score = $('#score').children(':selected').val();
     }
 
     setLoading(true);
