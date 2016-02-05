@@ -6,16 +6,7 @@ var fs = require('fs');
 var parserUtils = require('./parserUtils.js');
 var utils = require('../queries/utils');
 
-function getAllBusinessesIn(city, callback) {
-    utils.askDrill("select business_id, latitude, longitude from " + utils.datasetPath('business') + " where city='" + city + "'", function(answer) {
-        callback(answer.rows);
-    });
-}
-
 var cities = { // Cities we show in the webapp with their coordinates.
-    // Charlotte NE = 35.2455, -80.8065
-    // Charlotte W = OSEF, -80.8665
-    // Charlotte S = 35.195499999999996, OSEF
     'Charlotte': {
         latitude: 35.227087,
         longitude: -80.843127,
@@ -101,11 +92,11 @@ var cities = { // Cities we show in the webapp with their coordinates.
 function metersToDegrees(distance, latitude) {
     //Earth’s radius, sphere
     var radius = 6378137;
-    
+
     //Coordinate offsets in radians
     var newLatitude = distance / radius;
     var newLongitude = distance / (radius * Math.cos(Math.PI * latitude / 180));
-    
+
     //OffsetPosition, decimal degrees
     return {
         'latitude': newLatitude * 180 / Math.PI,
@@ -119,14 +110,14 @@ var city; // Name of the city where we have to proceed
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-        if (val === 'LV') {
-            city = 'Las Vegas';
-        } else {
-            city = utils.capitalizeFirstLetter(val);
-        }
-        break;
+            if (val === 'LV') {
+                city = 'Las Vegas';
+            } else {
+                city = utils.capitalizeFirstLetter(val);
+            }
+            break;
         default:
-        break;
+            break;
     }
 });
 
@@ -134,83 +125,72 @@ if (city === undefined) {
     console.log('Usage: node tiles CITY. E.g. \'node tiles Edinburgh\' will create a Edinburgh.geojson file');
 }
 
-getAllBusinessesIn(city, function(businesses) {
-    var metersInCoordinates = metersToDegrees(250, cities[city].latitude);
-    
-    var minLat, maxLat, minLon, maxLon;
-    if (cities[city].south < cities[city].north) {
-        minLat = cities[city].south;
-        maxLat = cities[city].north;
-    } else {
-        minLat = cities[city].north;
-        maxLat = cities[city].south;
+var metersInCoordinates = metersToDegrees(250, cities[city].latitude);
+
+var minLat, maxLat, minLon, maxLon;
+if (cities[city].south < cities[city].north) {
+    minLat = cities[city].south;
+    maxLat = cities[city].north;
+} else {
+    minLat = cities[city].north;
+    maxLat = cities[city].south;
+}
+
+if (cities[city].east < cities[city].west) {
+    minLon = cities[city].east;
+    maxLon = cities[city].west;
+} else {
+    minLon = cities[city].west;
+    maxLon = cities[city].east;
+}
+
+var json = {
+    "type": "FeatureCollection",
+    "features": []
+};
+
+var i, j, k;
+
+for (i = minLat; i < maxLat; i += metersInCoordinates.latitude) {
+    for (j = minLon; j < maxLon; j += metersInCoordinates.longitude) {
+        json.features.push({
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [i, j],
+                    [i, j + metersInCoordinates.longitude],
+                    [i + metersInCoordinates.latitude, j + metersInCoordinates.longitude],
+                    [i + metersInCoordinates.latitude, j]
+                ]
+            },
+            "properties": {}
+        });
     }
-    
-    if (cities[city].east < cities[city].west) {
-        minLon = cities[city].east;
-        maxLon = cities[city].west;
-    } else {
-        minLon = cities[city].west;
-        maxLon = cities[city].east;
+}
+// Adding the features
+fs.readFile('../static/features/' + city + '.json', 'utf8', function(err, data) { // Getting the features
+    if (err) {
+        return console.log(err);
     }
-    
-    var json = {
-        "type": "FeatureCollection",
-        "features": []
-    };
-    
-    var businessesInTile = [];
-    var i, j, k;
-    
-    for (i = minLat; i < maxLat; i += metersInCoordinates.latitude) {
-        for (j = minLon; j < maxLon; j += metersInCoordinates.longitude) {
-            businessesInTile = [];
-            for (k = 0; k < businesses.length; k++) {
-                if (businesses[k].latitude >= i && businesses[k].latitude <= i + metersInCoordinates.latitude && businesses[k].longitude >= j && businesses[k].longitude <= j + metersInCoordinates.longitude) {
-                    businessesInTile.push(businesses[k].business_id);
-                }
-            }
-            json.features.push({
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [i, j],
-                        [i, j + metersInCoordinates.longitude],
-                        [i + metersInCoordinates.latitude, j + metersInCoordinates.longitude],
-                        [i + metersInCoordinates.latitude, j]
-                    ]
-                },
-                "properties": {
-                    "business_ids": businessesInTile
-                }
-            });
-        }
-    }
-    // Adding the features
-    fs.readFile('../static/features/' + city + '.json', 'utf8', function(err, data) { // Getting the features
-        if (err) {
-            return console.log(err);
-        }
-        var source = JSON.parse(data); // Parsing the fatures to manipulate them.
-        parserUtils.isDrillRunning(function(running) {
-            if (running === false) {
-                console.log('Start Apache Drill before running this algorithm');
-            } else {
-                var centerTile;
-                for (var i = 0; i < json.features.length; i++) {
-                    centerTile = utils.getCenterTile(json.features[i].geometry.coordinates);
-                    for (var j = 0; j < source.types.length; j++) {
-                        if (['atm', 'stadium', 'convenience', 'restaurant', 'bank', 'toilets', 'kindergarten', 'guest', 'theatre', 'college', 'gallery', 'museum', 'courthouse'].indexOf(source.types[j]) != -1) {
-                            json.features[i].properties[source.types[j]] = Math.round(parserUtils.getDistanceToNearestElement(centerTile, source[source.types[j]]) * 1000);
-                            if (source.types[j] == 'atm') {
-                                json.features[i].properties['atm.1'] = parserUtils.getNumberOfFeaturesforRadius(centerTile, 100, source[source.types[j]]);
-                            }
+    var source = JSON.parse(data); // Parsing the fatures to manipulate them.
+    parserUtils.isDrillRunning(function(running) {
+        if (running === false) {
+            console.log('Start Apache Drill before running this algorithm');
+        } else {
+            var centerTile;
+            for (var i = 0; i < json.features.length; i++) {
+                centerTile = utils.getCenterTile(json.features[i].geometry.coordinates);
+                for (var j = 0; j < source.types.length; j++) {
+                    if (['atm', 'stadium', 'convenience', 'restaurant', 'bank', 'toilets', 'kindergarten', 'guest', 'theatre', 'college', 'gallery', 'museum', 'courthouse'].indexOf(source.types[j]) != -1) {
+                        json.features[i].properties[source.types[j]] = Math.round(parserUtils.getDistanceToNearestElement(centerTile, source[source.types[j]]) * 1000);
+                        if (source.types[j] == 'atm') {
+                            json.features[i].properties['atm.1'] = parserUtils.getNumberOfFeaturesforRadius(centerTile, 100, source[source.types[j]]);
                         }
                     }
                 }
             }
-            fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
-        });
+        }
+        //fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
     });
 });

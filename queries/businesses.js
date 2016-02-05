@@ -2,7 +2,6 @@ var utils = require('./utils');
 
 function getBusinessesWithCategoryInCity(city, category, callback) {
     utils.askDrill("select business_id, latitude, longitude from " + utils.datasetPath('business') + " where city='" + city + "' and true=repeated_contains(categories,'" + category + "')", function(answer) {
-        console.log(answer);
         callback(answer.rows);
     });
 }

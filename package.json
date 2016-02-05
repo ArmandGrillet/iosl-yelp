@@ -15,7 +15,12 @@
     "dependencies": {
         "express": "^4.13.3",
         "path": "^0.12.7",
-        "request": "^2.65.0"
+        "request": "^2.65.0",
+        "async": "latest",
+        "fs": "latest",
+        "path": "latest",
+        "json2csv": "latest",
+        "tcp-port-used": "latest"
     },
     "devDependencies": {
         "request": "^2.65.0"

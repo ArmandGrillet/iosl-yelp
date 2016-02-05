@@ -38,13 +38,13 @@ html, body {
 
 /* Prod */
 #prod-options {
-    width: 300px;
+    width: 312px;
     height: 100%;
     float: left;
 }
 
 #prod-map {
-    width: calc(100% - 300px);
+    width: calc(100% - 312px);
     height: 100%;
 }
 
@@ -58,4 +58,20 @@ html, body {
     padding: 15px 15px;
     font-size: 18px;
     line-height: 20px;
+}
+
+#hotgrid-options {
+    display: none;
+}
+
+#loader {
+    display: none;
+    position:fixed;
+    margin-top: 10px;
+    bottom:0;
+    width: 312px;
+    background-color: #b02b2c;
+    color: #fafafa;
+    font-weight: bold;
+    font-size: 18px;
 }

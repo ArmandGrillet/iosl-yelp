@@ -4,7 +4,6 @@
 var businesses = require('./businesses');
 var example = require('./example');
 var grid_example = require('./grid_example');
-var features = require('./features');
 var hotgrid = require('./hotgrid');
 var hotspots = require('./hotspots');
 var hotzones = require('./hotzones');
@@ -19,9 +18,6 @@ module.exports = {
                 break;
             case 'example':
                 example.get(parameters, callback);
-                break;
-            case 'features':
-                features.get(parameters, callback);
                 break;
             case 'hotspots':
                 hotspots.get(parameters, callback);

@@ -4,22 +4,22 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" href="./icon.ico">
-	
+
 	<meta name="author" content="IoSL - Yelp team">
 	<title>IoSL - Yelp</title>
 	<meta name="description" content="">
 	<meta name="keywords" content="">
-	
+
 	<!-- CSS -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/style.css">
-	
+
 	<!-- JS -->
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="js/prod.js"></script>
-	
+
 </head>
 <body>
 	<div id="prod-options">
@@ -32,7 +32,6 @@
 			</div>
 		</nav>
 		<div id="prod-form">
-			<label>City</label>
 			<select class="form-control" id="cities">
 				<option value="Edinburgh" selected>Edinburgh</option>
 				<option value="Pittsburgh">Pittsburgh</option>
@@ -45,21 +44,33 @@
 				<option value="Waterloo">Waterloo</option>
 				<option value="Karlsruhe">Karlsruhe</option>
 			</select>
-			<br />
-			<label>Category</label>
-			<select class="form-control" id="categories">
-				<option value="Bars" selected>Bars</option>
-				<option value="Cafe">Cafe</option>
-				<option value="Fast Food">Fast Food</option>
-			</select>
-			<br />
-			<input type="radio" name="algorithm" value="businesses" id="businesses-algorithm" checked> Existing businesses
-			<br />
-			<input type="radio" name="algorithm" value="hotgrid" id="hotgrid-algorithm"> Prediction of success
+			<br>
+			<div class="btn-group btn-toggle">
+				<button class="btn btn-primary active" id="businesses">Existing businesses</button>
+				<button class="btn btn-default" id="hotgrid">Prediction grid</button>
+			</div>
+			<br>
+			<br>
+			<div id="businesses-options">
+				<label>Category</label>
+				<select class="form-control" id="categories">
+					<option value="Bars" selected>Bars</option>
+					<option value="Cafe">Cafe</option>
+					<option value="Fast Food">Fast Food</option>
+				</select>
+			</div>
+			<div id="hotgrid-options">
+				<label>Proximity to</label>
+				<select class="form-control" id="proximity">
+					<option value="Bars" selected>Nothing</option>
+					<option value="Cafe">Cafe</option>
+					<option value="Fast Food">Fast Food</option>
+				</select>
+			</div>
 		</div>
-		<br />
-		<br />
-		
+		<div id="loader">
+			<p class="text-center">Loading...</p>
+		</div>
 	</div>
 </div>
 <div id="prod-map">

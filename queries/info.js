@@ -1,9 +1,7 @@
 var utils = require('./utils');
 
 function getBusinessInfo(business_id, callback) {
-    console.log(business_id);
     utils.askDrill("select name, full_address from " + utils.datasetPath('business') + " where business_id='" + business_id + "'", function(answer) {
-        console.log(answer);
         callback(answer.rows[0]);
     });
 }
@@ -16,7 +14,6 @@ module.exports = {
             });
         } else {
             getBusinessInfo(parameters.business_id, function(business) {
-                console.log(business);
                 callback(business);
             });
         }
