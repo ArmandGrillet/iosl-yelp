@@ -58,6 +58,7 @@ window.onload = function() {
     // When the user selects a new city we move the map's center to the city selected using moveTo().
     $('#cities').change(function() {
         if (!isLoading()) {
+            hideBusinessInfo();
             moveTo($(this).children(':selected').val());
             request($(this).children(':selected').val(), $('#categories').children(':selected').val());
         } else {
@@ -68,6 +69,7 @@ window.onload = function() {
     $('#categories').change(function() {
         if (!isLoading()) {
             request($('#cities').children(':selected').val(), $(this).children(':selected').val());
+            hideBusinessInfo();
         } else {
             return false;
         }
@@ -81,6 +83,7 @@ window.onload = function() {
         if (!isLoading() && $(this).attr('class') === 'btn btn-default') {
             $(this).attr('class', 'btn btn-primary active');
             $('#hotgrid').attr('class', 'btn btn-default');
+            displayOptions('businesses');
             request($('#cities').children(':selected').val(), $('#categories').children(':selected').val());
         }
     });
@@ -89,6 +92,8 @@ window.onload = function() {
         if (!isLoading() && $(this).attr('class') === 'btn btn-default') {
             $(this).attr('class', 'btn btn-primary active');
             $('#businesses').attr('class', 'btn btn-default');
+            hideBusinessInfo();
+            displayOptions('hotgrid');
             request($('#cities').children(':selected').val(), $('#categories').children(':selected').val());
         }
     });
@@ -133,7 +138,7 @@ function display(data) {
                 }
                 if (markerParameters.options !== undefined) {
                     if (markerParameters.options.onclick === true) { // This option is not part of the API, if the value onclick is set to true we will fire an event when the user clicks on the marker using markerClick().
-                        // marker.on('click', markerClick);
+                        marker.on('click', markerClick);
                     }
                     if (markerParameters.options.icon !== undefined) {
                         marker.setIcon(L.icon({
@@ -210,6 +215,15 @@ function setLoading(newValue) {
     }
 }
 
+function displayOptions(algorithm) {
+    if (algorithm === 'businesses') {
+        $('#hotgrid-options').hide();
+    } else {
+        $('#businesses-options').hide();
+    }
+    $('#' + algorithm + '-options').show();
+}
+
 function request(city, category) {
     var query = {
         'latitude': map.getCenter().lat,
@@ -237,5 +251,31 @@ function moveTo(city) {
         map.panTo(new L.LatLng(cities[city].latitude, cities[city].longitude));
     } else {
         alert('The city selected is not in our database.');
+    }
+}
+
+function hideBusinessInfo() {
+    $('#business-name').text('');
+    $('#business-address').text('');
+    $('#business-stars').text('');
+    $('#business-reviews').text('');
+}
+
+// Event hander if there is a click on a marker that has a "onclick" event.
+function markerClick(e) {
+    if (this.options.alt !== undefined) {
+        setLoading(true);
+        // We create a small query to use the info algorithm.
+        var query = {};
+        query.algorithm = 'info';
+        query.business_id = this.options.alt; // We're using the alt option to get the business id.
+
+        $.get('/infoquery', query, function(businessInfo) {
+            setLoading(false);
+            $('#business-name').text(businessInfo.name); // Display what is returned by info.
+            $('#business-address').text('Address: ' + businessInfo.full_address.replace(/\n/g, ', '));
+            $('#business-stars').text('Rating: ' + businessInfo.stars + ' / 5');
+            $('#business-reviews').text('Reviews: ' + businessInfo.review_count);
+        });
     }
 }
