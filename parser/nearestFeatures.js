@@ -1,10 +1,12 @@
+/* Find the nearest feature in each category for each business */
+
 /*jslint node: true */
 'use strict';
 
-var fs = require('fs');
-var json2csv = require('json2csv');
-var parserUtils = require('./parserUtils.js');
-var utils = require('../queries/utils');
+var fs = require('fs'); // We want to write a file thus we need fs.
+var json2csv = require('json2csv'); // Export a JSON into a CSV.
+var parserUtils = require('./parserUtils.js'); // Regular utils for parser.
+var utils = require('../queries/utils'); // Regular utils for queries.
 
 var inputFile; // Name of the ouput file (without file extension)
 var city; // Name of the city where we have to proceed
@@ -14,20 +16,20 @@ var category; // Category of businesses observed
 process.argv.forEach(function(val, index, array) {
     switch (index) {
         case 2:
-        inputFile = val;
-        break;
+            inputFile = val;
+            break;
         case 3:
-        if (val === 'LV') {
-            city = 'Las Vegas';
-        } else {
-            city = utils.capitalizeFirstLetter(val);
-        }
-        break;
+            if (val === 'LV') {
+                city = 'Las Vegas';
+            } else {
+                city = utils.capitalizeFirstLetter(val);
+            }
+            break;
         case 4:
-        category = utils.capitalizeFirstLetter(val);
-        break;
+            category = utils.capitalizeFirstLetter(val);
+            break;
         default:
-        break;
+            break;
     }
 });
 
@@ -54,19 +56,19 @@ if (inputFile === undefined || city === undefined || category === undefined) { /
                     */
                     var fields = ['name', 'success'].concat(source.types); // The two first colmuns: name of the business and its success
                     var rows = []; // Array containing the JSON rows, a JSON row correspond to a business
-                    
+
                     var row = {}; // We use this JSON file to store one row before pushing it to the array.
                     for (var i = 0; i < businesses.length; i++) {
                         row = {
                             'name': businesses[i].name,
                             'success': businesses[i].success
                         };
-                        for (var j = 2; j < fields.length; j++) { // We calculate the minimal distance to each feature.
-                            row[fields[j]] = Math.round(parserUtils.getDistanceToNearestElement(businesses[i], source[fields[j]]) * 1000);
+                        for (var j = 0; j < source.types.length; j++) { // We calculate the minimal distance to each feature.
+                            row[source.types[j]] = Math.round(parserUtils.getDistanceToNearestElement(businesses[i], source[source.types[j]]) * 1000);
                         }
                         rows.push(row); // We push the business to the array containing all of them.
                     }
-                    
+
                     json2csv({ // We use the json2csv module to transform our json objects into a .csv file.
                         data: rows,
                         fields: fields
@@ -77,7 +79,7 @@ if (inputFile === undefined || city === undefined || category === undefined) { /
                         // We write the file in the same directory as the parser, using the name given by the user as an input.
                         fs.writeFile('./' + city + '-' + category + '.csv', csv, function(err) {
                             if (err)
-                            throw err;
+                                throw err;
                             console.log('File saved: ' + __dirname + '/' + city + '-' + category + '.csv');
                         });
                     });

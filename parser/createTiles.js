@@ -1,11 +1,13 @@
+/* Create the grids used by the queries */
+
 /*jslint node: true */
 'use strict';
 
 var fs = require('fs'); // We want to write the grid thus we need fs.
 var parserUtils = require('./parserUtils.js'); // Regular utils for parser.
-var utils = require('../queries/utils'); // Regular utils.
+var utils = require('../queries/utils'); // Regular utils for queries.
 
-// Cities we show in the webapp with their coordinates.
+// Positions of the cities handled by Yelp.
 var cities = {
     'Charlotte': {
         latitude: 35.227087,
@@ -89,6 +91,7 @@ var cities = {
     },
 };
 
+// Transform a distance in meters into a new latitude/longitude.
 function metersToDegrees(distance, latitude) {
     //Earth’s radius, sphere
     var radius = 6378137;
@@ -104,7 +107,8 @@ function metersToDegrees(distance, latitude) {
     };
 }
 
-var city; // Name of the city where we have to proceed
+// Name of the city where we have to proceed
+var city;
 
 // Processing the parameters.
 process.argv.forEach(function(val, index, array) {
@@ -121,12 +125,15 @@ process.argv.forEach(function(val, index, array) {
     }
 });
 
+// We need a city.
 if (city === undefined) {
     console.log('Usage: node tiles CITY. E.g. \'node tiles Edinburgh\' will create a Edinburgh.geojson file');
 }
 
+// Get the coordinates representing 250 meters in the city.
 var metersInCoordinates = metersToDegrees(250, cities[city].latitude);
 
+// Setting the limits of the grid.
 var minLat, maxLat, minLon, maxLon;
 if (cities[city].south < cities[city].north) {
     minLat = cities[city].south;
@@ -144,16 +151,19 @@ if (cities[city].east < cities[city].west) {
     maxLon = cities[city].east;
 }
 
-var json = {
+// Creation of the grid.
+var geojson = {
     "type": "FeatureCollection",
     "features": []
 };
 
-var i, j, k;
+// Variables for the loops.
+var i, j;
 
+// Add the tiles on the grid based on the limits.
 for (i = minLat; i < maxLat; i += metersInCoordinates.latitude) {
     for (j = minLon; j < maxLon; j += metersInCoordinates.longitude) {
-        json.features.push({
+        geojson.features.push({
             "type": "Feature",
             "geometry": {
                 "type": "Polygon",
@@ -168,29 +178,24 @@ for (i = minLat; i < maxLat; i += metersInCoordinates.latitude) {
         });
     }
 }
-// Adding the features
-fs.readFile('../static/features/' + city + '.json', 'utf8', function(err, data) { // Getting the features
-    if (err) {
+// Adding the features we need to the grid
+fs.readFile('../static/features/' + city + '.json', 'utf8', function(err, data) { // Getting the features from the linked JSON file.
+    if (err) { // Problem to read the file.
         return console.log(err);
     }
-    var source = JSON.parse(data); // Parsing the fatures to manipulate them.
-    parserUtils.isDrillRunning(function(running) {
-        if (running === false) {
-            console.log('Start Apache Drill before running this algorithm');
-        } else {
-            var centerTile;
-            for (var i = 0; i < json.features.length; i++) {
-                centerTile = utils.getCenterTile(json.features[i].geometry.coordinates);
-                for (var j = 0; j < source.types.length; j++) {
-                    if (['atm', 'stadium', 'convenience', 'restaurant', 'bank', 'toilets', 'kindergarten', 'guest', 'theatre', 'college', 'gallery', 'museum', 'courthouse'].indexOf(source.types[j]) != -1) {
-                        json.features[i].properties[source.types[j]] = Math.round(parserUtils.getDistanceToNearestElement(centerTile, source[source.types[j]]) * 1000);
-                        if (source.types[j] == 'atm') {
-                            json.features[i].properties['atm.1'] = parserUtils.getNumberOfFeaturesforRadius(centerTile, 100, source[source.types[j]]);
-                        }
-                    }
+    var source = JSON.parse(data); // Parsing the features to manipulate them.
+    var centerTile;
+    var usefulFeatures = ['atm', 'stadium', 'convenience', 'restaurant', 'bank', 'toilets', 'kindergarten', 'guest', 'theatre', 'college', 'gallery', 'museum', 'courthouse'];
+    for (var i = 0; i < geojson.features.length; i++) { // Iterating through all the tiles.
+        centerTile = utils.getCenterTile(geojson.features[i].geometry.coordinates); // We use the center of the tile to determine the distance.
+        for (var j = 0; j < source.types.length; j++) { // Iterating through all the features.
+            if (usefulFeatures.indexOf(source.types[j]) != -1) { // This is a useful feature
+                geojson.features[i].properties[source.types[j]] = Math.round(parserUtils.getDistanceToNearestElement(centerTile, source[source.types[j]]) * 1000); // Setting the distance to the nearest feature of this kind.
+                if (source.types[j] == 'atm') { // An ATM, we need to know how many of them are in a redius of 100 meters.
+                    geojson.features[i].properties['atm.1'] = parserUtils.getNumberOfFeaturesforRadius(centerTile, 100, source[source.types[j]]); // Settign the number of ATMs in a 100m radius.
                 }
             }
         }
-        fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
-    });
+    }
+    fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(geojson)); // Writing the file.
 });

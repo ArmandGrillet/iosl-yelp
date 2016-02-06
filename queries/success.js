@@ -188,9 +188,6 @@ module.exports = {
                             }
                         });
                     }
-
-                    console.log(answer);
-
                     callback(answer);
                 });
             });

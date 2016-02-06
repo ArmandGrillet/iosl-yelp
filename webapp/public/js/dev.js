@@ -195,7 +195,6 @@ function display(data) {
                     polygon = L.polygon(points, polygons[i].options).addTo(UILayer);
                     polygon.bindPopup(popup);
                 } else {
-                    console.log(polygons[i].options.fillColor);
                     L.polygon(points, polygons[i].options).addTo(UILayer);
                 }
             }

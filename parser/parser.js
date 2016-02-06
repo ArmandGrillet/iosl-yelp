@@ -1,12 +1,13 @@
-/*jslint node: true */
+/* Parse the multiple JSON we have for each feature into one JSON */
 
+/*jslint node: true */
 'use strict';
 
-var async = require('async');
-var fs = require('fs');
-var path = require('path');
+var async = require('async'); // We need async to handle multiple files in parallel.
+var fs = require('fs'); // We want to write a file thus we need fs.
+var path = require('path'); // We manipulate the path of the files in this algorithm thus we need path.
 
-// When a feature contains multiple nodes due to its size we're calculating its middle so that we only have one set of coordinates for one feature.
+// When a feature contains multiple nodes due to its size we're calculating its center so that we only have one set of coordinates for one feature.
 function getCenter(nodes, list) {
     var nodesCoordinates = [];
     for (var i = 0; i < nodes.length; i++) {
@@ -51,15 +52,15 @@ if (inputDir === undefined || outputFile === undefined) {
     console.log("Usage: node parser INPUTDIRECTORY OUTPUTFILE. E.g. 'node parser path/to/city/ city' will create a city.json");
 } else { // All the parameters are here, we can parse the input directory to create the JSON.
     var obj;
-    var goodJSON = {
+    var allFeaturesJSON = {
         types: []
     };
 
-    fs.readdir(inputDir, function(err, files) {
+    fs.readdir(inputDir, function(err, files) { // Read the directory and get all the files in it.
         if (err) {
             throw err;
         }
-        async.each(files, function(file, callback) {
+        async.each(files, function(file, callback) { // Async each handles all the files in parallel.
             if (path.extname(file) == '.json') { // We're only parsing JSON files.
                 fs.readFile(inputDir + file, 'utf8', function(err, data) {
                     if (err) {
@@ -72,18 +73,18 @@ if (inputDir === undefined || outputFile === undefined) {
                     obj = JSON.parse(data); // Parsing the JSON
                     for (var i = 0; i < obj.elements.length; i++) { // Analyzing each element in it.
                         if (i === 0) { // First element analyzed in this JSON, we're adding the feature and creating an array to store the coordinates for this feature.
-                            goodJSON.types.push(name);
-                            goodJSON[name] = [];
+                            allFeaturesJSON.types.push(name);
+                            allFeaturesJSON[name] = [];
                         }
 
                         if (obj.elements[i].tags !== undefined) { // A real feature
                             if (obj.elements[i].type == 'node') { // Simple coordinates, just a node
-                                goodJSON[name].push({
+                                allFeaturesJSON[name].push({
                                     latitude: obj.elements[i].lat,
                                     longitude: obj.elements[i].lon
                                 });
                             } else if (obj.elements[i].type === 'way') { // Multiple coordinates, we need to compute the center
-                                goodJSON[name].push(getCenter(obj.elements[i].nodes, obj.elements));
+                                allFeaturesJSON[name].push(getCenter(obj.elements[i].nodes, obj.elements));
                             } else if (obj.elements[i].type === 'relation') { // Add tags to the ways of the relation so that we'll add them later in the loop.
                                 for (var j = 0; j < obj.elements[i].members.length; j++) {
                                     for (var k = 0; k < obj.elements.length; k++) {
@@ -104,11 +105,11 @@ if (inputDir === undefined || outputFile === undefined) {
             if (err) {
                 console.log(err);
             } else { // All the files have been processed without error, we can write the output file.
-                fs.writeFile("./" + outputFile + ".json", JSON.stringify(goodJSON), function(err) {
+                fs.writeFile("./" + outputFile + ".json", JSON.stringify(allFeaturesJSON), function(err) {
                     if (err) {
                         return console.log(err);
                     }
-                    console.log(outputFile + " was saved!");
+                    console.log(outputFile + " has been saved.");
                 });
             }
         });

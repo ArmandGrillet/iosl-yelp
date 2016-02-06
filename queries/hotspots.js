@@ -9,7 +9,7 @@ function getHostpots(hotspots) { //Function to make the array with unique values
             uniqueHotspots.push(hotspots[i]);
         }
     }
-    
+
     return uniqueHotspots;
 }
 
@@ -32,57 +32,57 @@ function get_hotspots(longitude, latitude) {
                     'longitude': longitude[j]
                 });
                 if (hotspot_count > hotspot_count_value) { //capturing the coordinates when it is considered a hotspot cluster, '=' because we just want to add once
-                hotspot_cluster_shop_list.push({ //Adding it to Cluster shop list
-                    'latitude': latitude[j],
-                    'longitude': longitude[j]
-                });
+                    hotspot_cluster_shop_list.push({ //Adding it to Cluster shop list
+                        'latitude': latitude[j],
+                        'longitude': longitude[j]
+                    });
+                    hotspots.push({
+                        'latitude': latitude[j],
+                        'longitude': longitude[j]
+                    });
+                }
+            }
+        }
+        if (hotspot_count > hotspot_count_value) {
+            for (j = 0; j < temp_hotspots.length; j++) {
                 hotspots.push({
-                    'latitude': latitude[j],
-                    'longitude': longitude[j]
+                    'latitude': temp_hotspots[j].latitude,
+                    'longitude': temp_hotspots[j].longitude
+                });
+                hotspot_cluster_shop_list.push({ // Adding it to Cluster shop list
+                    'latitude': temp_hotspots[j].latitude,
+                    'longitude': temp_hotspots[j].longitude
+                });
+            }
+        } else {
+            hotspot_cluster_shop_list = [];
+        }
+        temp_hotspots = [];
+        if (hotspot_count > hotspot_count_value) { //capturing the coordinates of base shop from where we were calculating distances from other shops
+            hotspots.push({
+                'latitude': latitude[i],
+                'longitude': longitude[i]
+            });
+            hotspot_cluster_shop_list.push({
+                'latitude': latitude[i],
+                'longitude': longitude[i]
+            });
+            hotspot_cluster_shop_list = getHostpots(hotspot_cluster_shop_list);
+        }
+        if (hotspot_count > hotspot_count_value) { //Here we are adding the all the shops in the cluster list and sending them to the function to get the mean of there cluster
+            var temp_coordinates = [];
+            temp_coordinates = meanHotspotPoint(hotspot_cluster_shop_list);
+            for (j = 0; j < temp_coordinates.length; j++) {
+                hotspot_cluster_mean_point_list.push({
+                    'latitude': temp_coordinates[j].latitude,
+                    'longitude': temp_coordinates[j].longitude
                 });
             }
         }
-    }
-    if (hotspot_count > hotspot_count_value) {
-        for (j = 0; j < temp_hotspots.length; j++) {
-            hotspots.push({
-                'latitude': temp_hotspots[j].latitude,
-                'longitude': temp_hotspots[j].longitude
-            });
-            hotspot_cluster_shop_list.push({ // Adding it to Cluster shop list
-                'latitude': temp_hotspots[j].latitude,
-                'longitude': temp_hotspots[j].longitude
-            });
-        }
-    } else {
         hotspot_cluster_shop_list = [];
     }
-    temp_hotspots = [];
-    if (hotspot_count > hotspot_count_value) { //capturing the coordinates of base shop from where we were calculating distances from other shops
-        hotspots.push({
-            'latitude': latitude[i],
-            'longitude': longitude[i]
-        });
-        hotspot_cluster_shop_list.push({
-            'latitude': latitude[i],
-            'longitude': longitude[i]
-        });
-        hotspot_cluster_shop_list = getHostpots(hotspot_cluster_shop_list);
-    }
-    if (hotspot_count > hotspot_count_value) { //Here we are adding the all the shops in the cluster list and sending them to the function to get the mean of there cluster
-        var temp_coordinates = [];
-        temp_coordinates = meanHotspotPoint(hotspot_cluster_shop_list);
-        for (j = 0; j < temp_coordinates.length; j++) {
-            hotspot_cluster_mean_point_list.push({
-                'latitude': temp_coordinates[j].latitude,
-                'longitude': temp_coordinates[j].longitude
-            });
-        }
-    }
-    hotspot_cluster_shop_list = [];
-}
-return getHostpots(meanHotspotsList(hotspot_cluster_mean_point_list)); // returning mean list of all clusters with unique value
-//return getHostpots(hotspots);
+    return getHostpots(meanHotspotsList(hotspot_cluster_mean_point_list)); // returning mean list of all clusters with unique value
+    //return getHostpots(hotspots);
 }
 
 function meanHotspotsList(hotspot_cluster_mean_point_list) {
@@ -100,15 +100,11 @@ function meanHotspotPoint(hotspot_cluster_shop_list) {
     }
     mean_latitude = mean_latitude / no_of_shops;
     mean_longitude = mean_longitude / no_of_shops;
-    
+
     mean_hotspot_point.push({
         'latitude': mean_latitude,
         'longitude': mean_longitude
     });
-    
-    for (i = 0; i < mean_hotspot_point.length; i++) {
-        console.log("Mean List " + mean_hotspot_point[i].latitude + " Mean longitude " + mean_hotspot_point[i].longitude);
-    }
     return mean_hotspot_point;
 }
 

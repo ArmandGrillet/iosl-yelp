@@ -1,13 +1,13 @@
-// Create a JSON file with center of the grid and distance to
+// Create a JSON file with center of the grid and distance to every features.
 
 /*jslint node: true */
 'use strict';
 
-var fs = require('fs');
-var parserUtils = require('./parserUtils.js');
-var utils = require('../queries/utils');
+var fs = require('fs'); // We want to write a file thus we need fs.
+var parserUtils = require('./parserUtils.js'); // Regular utils for parser.
+var utils = require('../queries/utils'); // Regular utils for queries.
 
-var city; // Name of the city where we have to proceed
+var city; // City where we have to proceed
 
 // Processing the parameters.
 process.argv.forEach(function(val, index, array) {
@@ -26,13 +26,14 @@ process.argv.forEach(function(val, index, array) {
 
 if (city === undefined) { // One of the input is missing.
     console.log("Usage: node gridFeatures CITY. E.g. 'node gridFeatures City ' will create a newCity.geojson file");
-} else {
+} else { // We have all the parameters we need.
     fs.readFile(utils.featuresPath(city), 'utf8', function(err, data) { // Getting all the features
         if (err) {
             return console.log(err);
         }
         var features = JSON.parse(data); // Parsing the fatures to manipulate them.
 
+        // We get the grid.
         utils.getGrid(city, function(grid) {
             var json = {
                 "type": "FeatureCollection",
@@ -40,9 +41,10 @@ if (city === undefined) { // One of the input is missing.
             };
             var i, j;
             var tile, center;
-            for (i = 0; i < grid.features.length; i++) { // Do not confond grid.features and features.
+            for (i = 0; i < grid.features.length; i++) { // Do not confond grid.features and regular features.
                 tile = grid.features[i];
                 center = utils.getCenterTile(tile.geometry.coordinates);
+                // We add the features in a radius of 100/250/500m as well as the nearest feature in each category.
                 for (j = 0; j < features.types.length; j++) {
                     tile.properties[features.types[j]] = {
                         radius: {}
@@ -52,8 +54,9 @@ if (city === undefined) { // One of the input is missing.
                     tile.properties[features.types[j]].radius['250'] = parserUtils.getNumberOfFeaturesforRadius(center, 250, features[features.types[j]]);
                     tile.properties[features.types[j]].radius['500'] = parserUtils.getNumberOfFeaturesforRadius(center, 500, features[features.types[j]]);
                 }
-                json.features.push(tile);
+                json.features.push(tile); // Update the tile.
             }
+            // Write the tile.
             fs.writeFileSync('../static/grid/new' + city + '.geojson', JSON.stringify(json));
         });
     });

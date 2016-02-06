@@ -1,9 +1,13 @@
+// Useful features used multiple times in parser.
+
 /*jslint node: true */
 'use strict';
-var utils = require('../queries/utils');
+var utils = require('../queries/utils'); // We need the utils functions used by the queries.
+// tcp-port-used allows us to check if a port is used, useful to see if Apache Drill is running.
 var tcpPortUsed = require('tcp-port-used');
 
 module.exports = {
+    // Add the success to every businesses given as a parameter using their number of checkins, stars and reviews.
     addSuccess: function(businesses) {
         var averageCheckins = 0;
         var averageStars = 0;
@@ -46,6 +50,8 @@ module.exports = {
         }
         return businessesWithSuccess;
     },
+
+    // Tells if Apache Drill is running.
     isDrillRunning: function(callback) {
         tcpPortUsed.check(8047) // localhost:8047 = Apache Drill
             .then(function(inUse) {
@@ -54,6 +60,7 @@ module.exports = {
                 callback(false);
             });
     },
+
     /*
     Function to get the number of checkins per week for a business.
         id = id of the business
@@ -86,7 +93,7 @@ module.exports = {
             - All the checkins
             - All the businesses in the city in a specific category.
         */
-        var superThis = this;
+        var self = this;
         utils.askDrill("SELECT table_business.business_id, table_checkin.checkin_info from " + utils.datasetPath('checkin') + " AS table_checkin INNER JOIN " + utils.datasetPath('business') + " AS table_business ON table_checkin.business_id = table_business.business_id WHERE table_business.city = '" + city + "' AND true=repeated_contains(table_business.categories,'" + category + "')", function(checkins) {
             utils.askDrill("select business_id, name, total_checkins, stars, review_count, latitude, longitude from " + utils.datasetPath('business') + " WHERE city='" + city + "' AND true=repeated_contains(categories,'" + category + "')", function(rawBusinesses) {
                 var businesses = [];
@@ -98,7 +105,7 @@ module.exports = {
                         'longitude': rawBusinesses.rows[i].longitude,
                         'stars': rawBusinesses.rows[i].stars,
                         'reviews': rawBusinesses.rows[i].review_count,
-                        'checkins': superThis.checkinsForId(rawBusinesses.rows[i].business_id, checkins)
+                        'checkins': self.checkinsForId(rawBusinesses.rows[i].business_id, checkins)
                     });
                 }
                 callback(businesses);
@@ -129,6 +136,7 @@ module.exports = {
         }
         return nearestDistance;
     },
+    // Function to get the number of features in a list that are in the radius given to a business
     getNumberOfFeaturesforRadius: function(business, radius, list) {
         var elementsInRadius = 0;
         var distance;
