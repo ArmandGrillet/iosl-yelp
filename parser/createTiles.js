@@ -1,12 +1,12 @@
 /*jslint node: true */
 'use strict';
 
-var async = require('async');
-var fs = require('fs');
-var parserUtils = require('./parserUtils.js');
-var utils = require('../queries/utils');
+var fs = require('fs'); // We want to write the grid thus we need fs.
+var parserUtils = require('./parserUtils.js'); // Regular utils for parser.
+var utils = require('../queries/utils'); // Regular utils.
 
-var cities = { // Cities we show in the webapp with their coordinates.
+// Cities we show in the webapp with their coordinates.
+var cities = {
     'Charlotte': {
         latitude: 35.227087,
         longitude: -80.843127,
@@ -191,6 +191,6 @@ fs.readFile('../static/features/' + city + '.json', 'utf8', function(err, data) 
                 }
             }
         }
-        //fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
+        fs.writeFileSync('../static/grid/' + city + '.geojson', JSON.stringify(json));
     });
 });
