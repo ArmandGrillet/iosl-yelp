@@ -1,10 +1,4 @@
-var utils = require('./utils');
-
-function getBusinessesInCity(city, callback) {
-    utils.askDrill("select name, latitude, longitude from " + utils.datasetPath('business') + " where city='" + city + "'", function(answer) {
-        callback(answer.rows);
-    });
-}
+var utils = require('./utils'); // Functions used by multiple queries are in utils.
 
 module.exports = {
     get: function(parameters, callback) {
@@ -17,7 +11,8 @@ module.exports = {
                 var gridPolygons = [];
                 var i;
                 for (i = 0; i < grid.features.length; i++) {
-                    if (grid.features[i].properties.business_ids.length >= parameters.minBusinessPerTile) { // There is at least 2 businesses in the area.
+                    // We send only the tiles for which the number of businesses is superior to what wants the user.
+                    if (grid.features[i].properties.business_ids.length >= parameters.minBusinessPerTile) {
                         gridPolygons.push({
                             points: [
                                 {
@@ -37,11 +32,12 @@ module.exports = {
                                     longitude: grid.features[i].geometry.coordinates[3][1]
                                 }
                             ],
-                            popup: grid.features[i].properties.business_ids.length.toString(),
+                            popup: grid.features[i].properties.business_ids.length.toString(), // Show the number of businesses in the tile.
                             options: {}
                         });
                     }
                 }
+                // Sending back the polygons.
                 var answer = {
                     polygons: gridPolygons
                 };

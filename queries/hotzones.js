@@ -1,51 +1,47 @@
-var utils = require('./utils');
+/* Display the hot zones of a city using the number of checkins in a tile */
+var utils = require('./utils'); // Functions used by multiple queries are in utils.
 
-function getCheckinsByBusinessId(city, callback) {
-    utils.askDrill("SELECT table_checkin.business_id,table_checkin.checkin_info from " + utils.datasetPath('checkin') + " AS table_checkin INNER JOIN " + utils.datasetPath('business') + " AS table_business ON table_checkin.business_id = table_business.business_id WHERE table_business.city = '" + city + "'", function(answer) {
+function getBusinessesWithCheckins(city, callback) {
+    utils.askDrill("SELECT table_checkin.business_id, table_checkin.checkin_info from " + utils.datasetPath('checkin') + " AS table_checkin INNER JOIN " + utils.datasetPath('business') + " AS table_business ON table_checkin.business_id = table_business.business_id WHERE table_business.city = '" + city + "'", function(answer) {
         callback(answer.rows);
     });
 }
 
-var sum = []; // number of checkins for one business
-var total_sum = 0; // total number of checkins in every business of the city
-
 module.exports = {
     get: function(parameters, callback) {
-        getCheckinsByBusinessId(parameters.city, function(businesses) {
-
-            for (var k = 0; k < businesses.length; k++) {
-                sum[businesses[k].business_id] = 0;
-            }
-
-            for (var i = 0; i < businesses.length; i++) {
+        getBusinessesWithCheckins(parameters.city, function(businesses) {
+            var i, j;
+            var checkin;
+            var checkinsPerBusiness = {}; // number of checkins for one business
+            for (i = 0; i < businesses.length; i++) {
+                checkinsPerBusiness[businesses[i].business_id] = 0;
                 checkin = JSON.parse(businesses[i].checkin_info);
                 for (var key in checkin) {
-                    sum[businesses[i].business_id] += checkin[key];
+                    checkinsPerBusiness[businesses[i].business_id] += checkin[key];
                 }
-                total_sum += sum[businesses[i].business_id];
             }
 
             utils.getGrid(parameters.city, function(grid) {
-                var gridPolygons = [];
-                var ratioCheckins = Array(grid.features.length).fill(4); // number of checkins per grid[][] divided by total number of checkins
-                var checkinMax = 0; //max number of checkins per grid[][]
-                var i;
+                var answer = {
+                    polygons: []
+                };
+                var maxCheckins = 0; // Maximum number of checkins in the grid.
 
                 for (i = 0; i < grid.features.length; i++) {
-                    if (grid.features[i].properties.business_ids.length >= 2) { // There is at least 2 businesses in the area.
-                        for (j = 0; j < grid.features[i].properties.business_ids.length; j++) {
-                            if (sum[grid.features[i].properties.business_ids[j]] !== undefined) {
-                                ratioCheckins[i] += sum[grid.features[i].properties.business_ids[j]];
-                            }
+                    grid.features[i].properties.checkins = 0;
+                    for (j = 0; j < grid.features[i].properties.business_ids.length; j++) {
+                        if (checkinsPerBusiness[grid.features[i].properties.business_ids[j]] !== undefined) {
+                            grid.features[i].properties.checkins += checkinsPerBusiness[grid.features[i].properties.business_ids[j]];
                         }
-                        if (ratioCheckins[i] > checkinMax)
-                            checkinMax = ratioCheckins[i];
+                    }
+                    if (maxCheckins < grid.features[i].properties.checkins) {
+                        maxCheckins = grid.features[i].properties.checkins;
                     }
                 }
 
                 for (i = 0; i < grid.features.length; i++) {
                     if (grid.features[i].properties.business_ids.length >= 2) { // There is at least 2 businesses in the area.
-                        gridPolygons.push({
+                        answer.polygons.push({
                             points: [
                                 {
                                     latitude: grid.features[i].geometry.coordinates[0][0],
@@ -64,19 +60,17 @@ module.exports = {
                                     longitude: grid.features[i].geometry.coordinates[3][1]
                                 }
                             ],
-                            popup: ratioCheckins[i].toString(),
+                            popup: grid.features[i].properties.checkins.toString(),
                             options: {
                                 stroke: false,
                                 fill: true,
                                 fillColor: "#FF0000",
-                                fillOpacity: (ratioCheckins[i] / checkinMax)
+                                fillOpacity: (grid.features[i].properties.checkins / maxCheckins)
                             }
                         });
                     }
                 }
-                var answer = {
-                    polygons: gridPolygons
-                };
+
                 callback(answer);
             });
         });

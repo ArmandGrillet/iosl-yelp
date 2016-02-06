@@ -1,4 +1,4 @@
-var utils = require('./utils');
+var utils = require('./utils'); // Functions used by multiple queries are in utils.
 var fs = require('fs');
 
 /*

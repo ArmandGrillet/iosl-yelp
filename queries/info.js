@@ -1,4 +1,4 @@
-var utils = require('./utils');
+var utils = require('./utils'); // Functions used by multiple queries are in utils.
 
 function getBusinessInfo(business_id, callback) {
     utils.askDrill("select name, full_address, stars, review_count from " + utils.datasetPath('business') + " where business_id='" + business_id + "'", function(answer) {

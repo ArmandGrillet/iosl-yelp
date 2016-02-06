@@ -1,3 +1,5 @@
+/* Useful functions for our queries. */
+
 /*jslint node: true */
 'use strict';
 

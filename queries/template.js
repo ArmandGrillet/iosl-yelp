@@ -1,4 +1,6 @@
-var utils = require('./utils');
+/* A function doing nothing as it's a template. */
+
+var utils = require('./utils'); // Functions used by multiple queries are in utils.
 
 // Write the inner functions here.
 function empty(callback) {
