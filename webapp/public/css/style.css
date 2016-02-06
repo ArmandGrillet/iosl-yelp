@@ -2,54 +2,19 @@ html, body {
     height: 100%;
 }
 
-.mdl-layout__header-row {
-    padding-left: 16px;
-}
-
-#app-grid {
-    padding: 0;
-}
-
-#configuration-column, #map-column {
-    margin: 0;
-}
-
-#configuration-column {
-    background-color: #fafafa;
-}
-
-#app-grid, #map-column {
-    min-height: 100%;
-    height: 100%;
-}
-
-#map-column {
-    width: calc(66.6666666667%);
-}
-
-#map-dev {
-    width: 100%;
-    height: 100%;
-}
-
-#request {
+#options {
     width: 300px;
-}
-
-/* Prod */
-#prod-options {
-    width: 312px;
     height: 100%;
     float: left;
 }
 
-#prod-map {
-    width: calc(100% - 312px);
+#map {
+    width: calc(100% - 300px);
     height: 100%;
 }
 
-#prod-form {
-    margin: 0 30px 0 15px;
+#input-options {
+    margin: 0 15px 0 15px;
 }
 
 #brand {
@@ -67,9 +32,9 @@ html, body {
 #loader {
     display: none;
     position:fixed;
-    margin-top: 10px;
+    padding-top: 10px;
     bottom:0;
-    width: 312px;
+    width: 300px;
     background-color: #b02b2c;
     color: #fafafa;
     font-weight: bold;

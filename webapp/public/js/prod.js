@@ -45,7 +45,7 @@ var cities = { // Cities we show in the webapp with their coordinates.
 
 // Once the .html page is loaded, we execute this code.
 window.onload = function() {
-    map = L.map('prod-map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15); // Sets the view to be in Edinburgh with a zoom level of 15.
+    map = L.map('map').setView([cities.Edinburgh.latitude, cities.Edinburgh.longitude], 15); // Sets the view to be in Edinburgh with a zoom level of 15.
     UILayer = new L.LayerGroup().addTo(map); // Adds the layer to the map object.
 
     // Downloads the map layer's data.

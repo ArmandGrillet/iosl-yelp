@@ -9,77 +9,66 @@
 	<title>IoSL - Yelp</title>
 	<meta name="description" content="">
 	<meta name="keywords" content="">
-	
+
 	<!-- CSS -->
-	<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.red-blue.min.css"	>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/style.css">
 
 	<!-- JS -->
-	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="js/dev.js"></script>
 </head>
 
 <body>
-	<div class="mdl-grid" id ="app-grid">
-		<div class="mdl-cell mdl-cell--4-col" id ="configuration-column">
-			<!-- Always shows a header, even in smaller screens. -->
-			<header class="mdl-layout__header">
-				<div class="mdl-layout__header-row">
-					<!-- Title -->
-					<span class="mdl-layout-title">IoSL - Yelp</span>
-				</div>
-			</header>
-
-			<div class="mdl-grid">
-				<div class="mdl-cell mdl-cell--12-col">
-					<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="clear">
-						Clear map
-					</button>
-					<h5>Request:</h5>
-					<div class="form-group">
-						<input type="text" class="form-control" id="request" placeholder="query or query?name1=value1&name2=value2">
-					</div>
-					<b>Examples of requests (tested in Edinburgh): </b>
-					<p>
-						businesses?category=Fast Food<br>
-						features<br>
-						hotgrid (work in progress)<br>
-						hotspots?category=Fast Food<br>
-						hotzones<br>
-						success?category=Fast Food<br>
-					</p>
-					<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="run-request">
-						Run
-					</button>
-					<br>
-					<br>
-					City:
-					<select class="select" id="cities">
-						<option value="Edinburgh" selected>Edinburgh</option>
-						<option value="Pittsburgh">Pittsburgh</option>
-						<option value="Charlotte">Charlotte</option>
-						<option value="Champaign">Champaign</option>
-						<option value="Phoenix">Phoenix</option>
-						<option value="Las Vegas">Las Vegas</option>
-						<option value="Madison">Madison</option>
-						<option value="Montreal">Montreal</option>
-						<option value="Waterloo">Waterloo</option>
-						<option value="Karlsruhe">Karlsruhe</option>
-					</select>
-					<h5>Marker:</h5>
-					<p id="marker-info">
-					</p>
+	<div id="options">
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<img alt="IoSL Logo" src="icon.png">
+					<div id="brand">IoSL - Yelp</div>
 				</div>
 			</div>
+		</nav>
+		<div id="input-options">
+			<select class="form-control" id="cities">
+				<option value="Edinburgh" selected>Edinburgh</option>
+				<option value="Pittsburgh">Pittsburgh</option>
+				<option value="Charlotte">Charlotte</option>
+				<option value="Champaign">Champaign</option>
+				<option value="Phoenix">Phoenix</option>
+				<option value="Las Vegas">Las Vegas</option>
+				<option value="Madison">Madison</option>
+				<option value="Montreal">Montreal</option>
+				<option value="Waterloo">Waterloo</option>
+				<option value="Karlsruhe">Karlsruhe</option>
+			</select>
+			<br />
+			<input type="text" class="form-control" id="request" placeholder="query or query?name1=value1&name2=value2">
+			<br />
+			<b>Examples of requests (tested in Edinburgh): </b>
+			<p>
+				businesses?category=Fast Food<br>
+				hotgrid (work in progress)<br>
+				hotspots?category=Fast Food<br>
+				hotzones<br>
+				success?category=Fast Food<br>
+			</p>
+			<button id="run-request">
+				Run
+			</button>
+			&nbsp;
+			<button id="clear">
+				Clear map
+			</button>
+			<br />
+			<h5>Marker:</h5>
+			<p id="marker-info">
+			</p>
 		</div>
-		<div class="mdl-cell mdl-cell--8-col" id ="map-column">
-			<div id="map-dev"></div>
-		</div>
+	</div>
+	<div id="map">
 	</div>
 </body>
 </html>
