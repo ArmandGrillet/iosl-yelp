@@ -1,3 +1,5 @@
+/* Call the right function with the name of the query. */
+
 /*jslint node: true */
 'use strict';
 
@@ -44,12 +46,13 @@ module.exports = {
         }
     },
     test: function(algorithm) {
+        // For tests we don't use parameters, we directly modify the file containing the algorithm.
         switch (algorithm) {
             case 'businesses':
                 businesses.test();
                 break;
             case 'gridExample':
-                gridExample.test(); // For the tests we don't use parameters, we directly modify the file containing the algorithm.
+                gridExample.test();
                 break;
             case 'hotspots':
                 hotspots.test();

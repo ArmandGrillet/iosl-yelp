@@ -3,74 +3,12 @@
 /*jslint node: true */
 'use strict';
 
-var request = require('request');
-var path = require('path');
-var fs = require('fs');
-
-function gridForBusinesses(businesses) {
-    var i, j;
-    // We're rounding the numbers to 0.001° = 111.32 m and removing the period.
-    for (i = 0; i < businesses.length; i++) {
-        businesses[i].latitude = Math.round(businesses[i].latitude * 1000);
-        businesses[i].longitude = Math.round(businesses[i].longitude * 1000);
-    }
-    var minLat = businesses[0].latitude,
-        maxLat = businesses[0].latitude,
-        minLon = businesses[0].longitude,
-        maxLon = businesses[0].longitude;
-
-    for (i = 1; i < businesses.length; i++) {
-        if (businesses[i].latitude < minLat) {
-            minLat = businesses[i].latitude;
-        } else if (businesses[i].latitude > maxLat) {
-            maxLat = businesses[i].latitude;
-        }
-
-        if (businesses[i].longitude < minLon) {
-            minLon = businesses[i].longitude;
-        } else if (businesses[i].longitude > maxLon) {
-            maxLon = businesses[i].longitude;
-        }
-    }
-
-    // Settling the grid and adding content
-    var grid = [];
-    for (i = 0; i <= maxLat - minLat; i++) {
-        grid[i] = [];
-        for (j = 0; j <= maxLon - minLon; j++) {
-            grid[i][j] = {
-                points: [{
-                    latitude: (i + minLat) / 1000,
-                    longitude: (j + minLon) / 1000
-                }, {
-                    latitude: (i + minLat) / 1000,
-                    longitude: ((j + minLon) + 1) / 1000
-                }, {
-                    latitude: ((i + minLat) + 1) / 1000,
-                    longitude: ((j + minLon) + 1) / 1000
-                }, {
-                    latitude: ((i + minLat) + 1) / 1000,
-                    longitude: (j + minLon) / 1000
-                }],
-                business_ids: []
-            };
-        }
-    }
-    for (i = 0; i < businesses.length; i++) {
-        grid[businesses[i].latitude - minLat][businesses[i].longitude - minLon].business_ids.push(businesses[i].business_id);
-    }
-
-    for (i = 0; i < grid.length; i++) {
-        for (j = 0; j < grid[i].length; j++) {
-            if (grid[i][j].business_ids.length === 0) { // No businesses here
-                grid[i].splice(j, 1);
-            }
-        }
-    }
-    return grid;
-}
+var request = require('request'); // We need the request framework to post requests to Drill.
+var path = require('path'); // We need path to normalize some paths.
+var fs = require('fs'); // We need fs to read the grid files.
 
 module.exports = {
+    /* Send a request to Apache Drill */
     askDrill: function(query, callback) {
         request.post(
             'http://localhost:8047/query.json', // Adress of Apache Drill
@@ -87,12 +25,15 @@ module.exports = {
             }
         );
     },
+    /* Capitalize the first letter of the string */
     capitalizeFirstLetter: function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     },
+    /* Return the dataset file path */
     datasetPath: function(dataset) {
         return 'dfs.`' + path.normalize(__dirname + '/../../yelp_dataset_challenge_academic_dataset/') + 'yelp_academic_dataset_' + dataset + '.json`';
     },
+    /* Return the distance in kilometers between two latitude/longitude */
     distance: function(lat1, lon1, lat2, lon2) {
         var radlat1 = Math.PI * lat1 / 180;
         var radlat2 = Math.PI * lat2 / 180;
@@ -106,9 +47,11 @@ module.exports = {
         dist = dist * 60 * 1.1515;
         return dist;
     },
+    /* Return the feature path for a city */
     featuresPath: function(city) {
         return path.normalize(__dirname + '/../static/features/' + city + '.json');
     },
+    /* Return the center of a tile using its coordinates that use the standard .geojson format */
     getCenterTile: function(coordinates) {
         var center = {
             latitude: coordinates[0][0],
@@ -122,22 +65,9 @@ module.exports = {
 
         return center;
     },
+    /* Return the grid of a city */
     getGrid: function(city, callback) {
         var grid = JSON.parse(fs.readFileSync('../static/grid/' + city + '.geojson', 'utf8'));
         return callback(grid);
-    },
-    getGridForCategory: function(city, category, callback) {
-        this.askDrill("select business_id, latitude, longitude from " + this.datasetPath('business') + " where city='" + city + "'", function(answer) {
-            var businesses = answer.rows;
-            for (var i = 0; i < businesses.length; i++) {
-                if (businesses[i].categories.indexOf(category) == -1) {
-                    businesses.splice(i, 1);
-                }
-            }
-            return callback(gridForBusinesses(businesses));
-        });
-    },
-    path: function(dataset) {
-        return path.normalize(__dirname + '/../../yelp_dataset_challenge_academic_dataset/') + 'yelp_academic_dataset_' + dataset + '.json';
     },
 };

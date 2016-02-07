@@ -1,5 +1,7 @@
+/* Returns the success of all the businesses in a category. */
+
 var utils = require('./utils'); // Functions used by multiple queries are in utils.
-var fs = require('fs');
+var fs = require('fs'); // We need to read the features of a city contained in a file.
 
 /*
 Function to get the number of checkins per week for a business.
@@ -79,6 +81,7 @@ function getDistanceToNearestElement(business, list) {
     return nearestDistance;
 }
 
+/* Returns all the features from a list that are in a 150m radius from a business */
 function getNumberOfFeaturesIn150Radius(type, business, list) {
     var elementsInRadius = 0;
     var distance;
@@ -91,6 +94,7 @@ function getNumberOfFeaturesIn150Radius(type, business, list) {
     return elementsInRadius;
 }
 
+/* Add the success to a list of businesses */
 function addSuccess(businesses) {
     var averageCheckins = 0,
         averageStars = 0,
@@ -99,7 +103,6 @@ function addSuccess(businesses) {
         maxStars = 0,
         maxReviews = 0;
     var businessesWithSuccess = [];
-
 
     // Calculating the mean of checkins, stars and review counts of the businesses.
     for (var i = 0; i < businesses.length; i++) {
@@ -138,25 +141,31 @@ function addSuccess(businesses) {
 
 module.exports = {
     get: function(parameters, callback) {
-        if (parameters.category === undefined) { // We only need to test name as city is a mandatory attribute {
+        // We need to know the category of the businesses.
+        if (parameters.category === undefined) {
             callback({
                 error: 'Parameter category is undefined'
             });
         } else {
-            fs.readFile(utils.featuresPath(parameters.city), 'utf8', function(err, data) { // Getting all the features
+            /* Get all the features using the files in static/features */
+            fs.readFile(utils.featuresPath(parameters.city), 'utf8', function(err, data) {
+                // Not able to read the file
                 if (err) {
                     callback({
                         error: err
                     });
                 }
                 var source = JSON.parse(data); // Parsing the fatures to manipulate them.
-                getBusinesses(parameters.city, parameters.category, function(businesses) { // We obtain the businesses
+                // Obtains the businesses in a city for a certain category.
+                getBusinesses(parameters.city, parameters.category, function(businesses) {
+                    // The answer is composed of circles with a marker in the middle.
                     var answer = {
                         markers: [],
                         circles: []
                     };
-                    var markerPopup = "";
-                    var circleColor = "";
+                    var markerPopup = ""; // Thext of the marker's popup.
+                    var circleColor = ""; // Color of the cirle depending on the success of the business.
+                    // For each business we create a circle and a marker.
                     for (var i = 0; i < businesses.length; i++) {
                         answer.markers.push({
                             popup: businesses[i].name,
@@ -164,12 +173,14 @@ module.exports = {
                             longitude: businesses[i].longitude
                         });
                         markerPopup = businesses[i].success + " ";
+                        // For each feature we display the number if there is features in a 150m radius around the business.
                         for (var j = 0; j < source.types.length; j++) {
                             if (getNumberOfFeaturesIn150Radius(source.types[j], businesses[i], source[source.types[j]]) > 0) {
                                 markerPopup += getNumberOfFeaturesIn150Radius(source.types[j], businesses[i], source[source.types[j]]) + " " + source.types[j] + ", ";
                             }
                         }
 
+                        // Color depending on the business' success
                         if (parseFloat(businesses[i].success) < 0.3) {
                             circleColor = "#0000ff";
                         } else if (parseFloat(businesses[i].success) < 0.5) {
@@ -177,6 +188,8 @@ module.exports = {
                         } else {
                             circleColor = "#ff0000";
                         }
+
+                        // Circle around the marker thus same latitude/longitude.
                         answer.circles.push({
                             latitude: businesses[i].latitude,
                             longitude: businesses[i].longitude,
@@ -193,5 +206,7 @@ module.exports = {
             });
         }
     },
-    test: function() {}
+    test: function() {
+        console.log('Test not yet implemented');
+    }
 };

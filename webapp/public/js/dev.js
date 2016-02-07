@@ -87,7 +87,7 @@ window.onload = function() {
         if (query.algorithm === undefined) { // Syntax error, alert the user.
             alert('The format of your query is not correct.');
         } else { // Everything looks fine, we send the query to the server, check app.js for the routing.
-            $.get('/mapquery', query, function(data) {
+            $.get('/query', query, function(data) {
                 display(data);
             });
         }
@@ -138,14 +138,6 @@ function display(data) {
                 if (markerParameters.options !== undefined) {
                     if (markerParameters.options.onclick === true) { // This option is not part of the API, if the value onclick is set to true we will fire an event when the user clicks on the marker using markerClick().
                         marker.on('click', markerClick);
-                    }
-                    if (markerParameters.options.icon !== undefined) {
-                        marker.setIcon(L.icon({
-                            iconUrl: '../markers/' + markerParameters.options.icon + '.png',
-                            iconRetinaUrl: '../markers/' + markerParameters.options.icon + '@2x.png',
-                            iconSize: [24, 24],
-                            iconAnchor: [12, 12]
-                        }));
                     }
                 }
                 marker.addTo(UILayer);
@@ -238,7 +230,7 @@ function markerClick(e) {
         query.algorithm = 'info';
         query.business_id = this.options.alt; // We're using the alt option to get the business id.
 
-        $.get('/infoquery', query, function(data) {
+        $.get('/query', query, function(data) {
             $('#marker-info').text(JSON.stringify(data)); // Display what is returned by info.
         });
     }

@@ -25,6 +25,7 @@ html, body {
     line-height: 20px;
 }
 
+/* Will be displayed when needed */
 #hotgrid-options {
     display: none;
 }
