@@ -49,7 +49,7 @@ window.onload = function() {
     UILayer = new L.LayerGroup().addTo(map); // Adds the layer to the map object.
 
     // Downloads the map layer's data.
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer.grayscale('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         minZoom: 10,
         maxZoom: 18,
         attribution: '© <a href=\'http://openstreetmap.org\'>OpenStreetMap</a> contributors'
