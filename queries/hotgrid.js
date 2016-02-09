@@ -54,11 +54,11 @@ module.exports = {
                                 longitude: grid.features[i].geometry.coordinates[3][1]
                             }
                         ],
-                        popup: score.toString(), // We display the score of the tile as a title.
+                        popup: Math.round(score * 100).toString() + " / 100", // We display the score of the tile as a title.
                         options: {
                             fillColor: color, // Color of the tile
                             stroke: false, // No stroke, we want something smooth
-                            fillOpacity: score // The transparency of the tile depends on its success
+                            fillOpacity: score - 0.3 // The transparency of the tile depends on its success
                         }
                     });
                 }
