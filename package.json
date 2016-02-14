@@ -1,0 +1,28 @@
+{
+    "name": "iosl-webapp",
+    "version": "0.0.1",
+    "description": "A webapp using the queries developed for the IoSL project \"Uncovering business opportunities rom Yelp and Open Street Map Data",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/username/repository.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.13.3",
+        "path": "^0.12.7",
+        "request": "^2.65.0",
+        "async": "latest",
+        "fs": "latest",
+        "path": "latest",
+        "json2csv": "latest",
+        "tcp-port-used": "latest"
+    },
+    "devDependencies": {
+        "request": "^2.65.0"
+    }
+}

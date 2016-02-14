@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="./icon.ico">
+
+	<meta name="author" content="IoSL - Yelp team">
+	<title>IoSL - Yelp</title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- JS -->
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+	<script src="js/TileLayer.Grayscale.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="js/prod.js"></script>
+
+</head>
+<body>
+	<div id="options">
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<img alt="IoSL Logo" src="icon.png">
+					<div id="brand">IoSL - Yelp</div>
+				</div>
+			</div>
+		</nav>
+		<div id="input-options">
+			<select class="form-control" id="cities">
+				<option value="Edinburgh" selected>Edinburgh</option>
+				<option value="Pittsburgh">Pittsburgh</option>
+				<option value="Charlotte">Charlotte</option>
+				<option value="Champaign">Champaign</option>
+				<option value="Phoenix">Phoenix</option>
+				<option value="Las Vegas">Las Vegas</option>
+				<option value="Madison">Madison</option>
+				<option value="Montreal">Montreal</option>
+				<option value="Waterloo">Waterloo</option>
+				<option value="Karlsruhe">Karlsruhe</option>
+			</select>
+			<br>
+			<div class="btn-group btn-toggle">
+				<button class="btn btn-primary active" id="businesses">Existing businesses</button>
+				<button class="btn btn-default" id="hotgrid">Prediction grid</button>
+			</div>
+			<br>
+			<br>
+			<div id="businesses-options">
+				<label>Category</label>
+				<select class="form-control" id="categories">
+					<option value="Bars" selected>Bars</option>
+					<option value="Cafe">Cafe</option>
+					<option value="Fast Food">Fast Food</option>
+				</select>
+				<br />
+				<label>Information about the business</label>
+				<br />
+				<h4 id="business-name"></h4>
+				<p id ="business-address"></p>
+				<p id ="business-stars"></p>
+				<p id ="business-reviews"></p>
+			</div>
+			<div id="hotgrid-options">
+				<p class="bold-red">
+					A red tile is a successful one.
+				</p>
+				<fieldset disabled>
+					<label>Business</label>
+				    <select class="form-control">
+				        <option>Bar</option>
+				    </select>
+				</fieldset>
+				<label>Weighting scale by</label>
+				<select class="form-control" id="score">
+					<option value="general_score" selected>Random Forest Model</option>
+					<option value="courthouse_score">Courthouse proximity</option>
+					<option value="college_score">College proximity</option>
+					<option value="theatre_score">Theatre proximity</option>
+					<option value="restaurant_score">Restaurant proximity</option>
+					<option value="museum_score">Museum proximity</option>
+				</select>
+			</div>
+		</div>
+		<div id="loader">
+			<p class="text-center">Loading...</p>
+		</div>
+	</div>
+</div>
+<div id="map">
+</div>
+</div>
+</div>
+</body>

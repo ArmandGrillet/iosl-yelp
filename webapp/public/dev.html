@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="./icon.ico">
+
+	<meta name="author" content="IoSL - Yelp team">
+	<title>IoSL - Yelp</title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- JS -->
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="js/dev.js"></script>
+</head>
+
+<body>
+	<div id="options">
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<img alt="IoSL Logo" src="icon.png">
+					<div id="brand">IoSL - Yelp</div>
+				</div>
+			</div>
+		</nav>
+		<div id="input-options">
+			<select class="form-control" id="cities">
+				<option value="Edinburgh" selected>Edinburgh</option>
+				<option value="Pittsburgh">Pittsburgh</option>
+				<option value="Charlotte">Charlotte</option>
+				<option value="Champaign">Champaign</option>
+				<option value="Phoenix">Phoenix</option>
+				<option value="Las Vegas">Las Vegas</option>
+				<option value="Madison">Madison</option>
+				<option value="Montreal">Montreal</option>
+				<option value="Waterloo">Waterloo</option>
+				<option value="Karlsruhe">Karlsruhe</option>
+			</select>
+			<br />
+			<input type="text" class="form-control" id="request" placeholder="query or query?name1=value1&name2=value2">
+			<br />
+			<b>Examples of requests (tested in Edinburgh): </b>
+			<p>
+				businesses?category=Fast Food<br>
+				gridExample?minBusinessPerTile=2<br />
+				hotgrid (work in progress)<br>
+				hotspots?category=Fast Food<br>
+				hotzones<br>
+				success?category=Fast Food<br>
+			</p>
+			<button id="run-request">
+				Run
+			</button>
+			&nbsp;
+			<button id="clear">
+				Clear map
+			</button>
+			<br />
+			<h5>Marker:</h5>
+			<p id="marker-info">
+			</p>
+		</div>
+	</div>
+	<div id="map">
+	</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+html, body {
+    height: 100%;
+}
+
+.bold-red {
+    color: red;
+    font-weight: bold;
+}
+
+#options {
+    width: 300px;
+    height: 100%;
+    float: left;
+}
+
+#map {
+    width: calc(100% - 300px);
+    height: 100%;
+}
+
+#input-options {
+    margin: 0 15px 0 15px;
+}
+
+#brand {
+    float: right;
+    height: 50px;
+    padding: 15px 15px;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+/* Will be displayed when needed */
+#hotgrid-options {
+    display: none;
+}
+
+#loader {
+    display: none;
+    position:fixed;
+    padding-top: 10px;
+    bottom:0;
+    width: 300px;
+    background-color: #b02b2c;
+    color: #fafafa;
+    font-weight: bold;
+    font-size: 18px;
+}
